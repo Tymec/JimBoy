@@ -1,5 +1,6 @@
 # JimBoy
-### A GameBoy Emulator that's being worked on in my spare time as a hobby project.
+### A GameBoy Emulator
+#### A project that I'm working on in my spare time as a hobby project
 ---
 
 ### To Do:
