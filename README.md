@@ -1,4 +1,4 @@
-<img align="center" width="400" src="./Assets/JimBoyBanner.png"></img>
+<img align="left" width="200" src="./Assets/logo.png"></img>
 ### A GameBoy Emulator
 #### A project that I'm working on in my spare time as a hobby project
 ---
