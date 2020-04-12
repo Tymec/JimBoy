@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Disassembler.cpp" />
     <ClCompile Include="MemoryController.cpp" />
     <ClCompile Include="Cartridge.cpp" />
     <ClCompile Include="Cpu.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Opcodes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Disassembler.h" />
     <ClInclude Include="MemoryController.h" />
     <ClInclude Include="Cartridge.h" />
     <ClInclude Include="Cpu.h" />

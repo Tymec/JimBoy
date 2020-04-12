@@ -95,13 +95,18 @@ private:
 	FlagsRegister flags; // Flags
 	uint8_t cycles{}; // Cycles
 
-	// Execute instruction
+	bool lowPowerMode{}; // Low Power Mode
+
+	// Execute current instruction
 	void executeInstruction();
 
-	// Read value from the bus at address
+	// Read & Write the Bus
 	uint8_t read(uint16_t address);
-	// Write value to the bus at address
 	void write(uint16_t address, uint8_t value);
+
+	// Read from memory
+	uint8_t read8();
+	uint16_t read16();
 
 	/// Opcodes
 	void OP_ld();

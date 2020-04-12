@@ -1,20 +1,26 @@
 #include "Cpu.h"
 
+static const bool LOGGING_ENABLED = true;
+
 // NOP: No operation.
 // Opcodes: 0x00
 void Cpu::OP_nop() {
+	if (LOGGING_ENABLED)
+		std::cout << "NOP" << std::endl;
 	return;
 }
 
 // STOP: Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
 // Opcodes: 0x10
 void Cpu::OP_stop() {
+	lowPowerMode = true;
+	if (LOGGING_ENABLED)
+		std::cout << "STOP" << std::endl;
 }
 
 // JR: Relative Jump by adding e8 to the current address if condition cc is met. 
 // Opcodes: 0x20, 0x30, 0x18, 0x28, 0x38
 void Cpu::OP_jr() {
-
 }
 
 // LD 16-Bit: Load value n16 into register r16. 
@@ -28,13 +34,14 @@ void Cpu::OP_ld() {
 }
 
 // INC 16-Bit: Increment value in register r16 by 1.
-// Opcodes: 0x04, 0x14, 0x24, 0x34, 0x0C, 0x1C, 0x2C, 0x3C
+// Opcodes: 0x03, 0x13, 0x23, 0x33 
 void Cpu::OP_inc16() {
 }
 
 // INC 8-Bit: Increment value in register r8 by 1.
-// Opcodes: 0x03, 0x13, 0x23, 0x33
+// Opcodes: 0x04, 0x14, 0x24, 0x34, 0x0C, 0x1C, 0x2C, 0x3C
 void Cpu::OP_inc() {
+
 }
 
 // DEC 8-Bit: Decrement value in register r8 by 1.
