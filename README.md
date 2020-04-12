@@ -6,7 +6,7 @@ A project that I'm working on in my spare time as a hobby project
 ---
 
 ### To Do:
-- Implement Opcode functionality
+- Implement Opcode functionality // GET RID OF OPCODE FUNCTIONS AND PUT FUNCTIONALITY IN SWITCH CASES
 - Implement PPU
 - Implement Display/Renderer
 - Implement Input
