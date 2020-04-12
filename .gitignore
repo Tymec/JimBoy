@@ -34,6 +34,16 @@
 # Visual Studio
 .vs/
 
+# Build Files
+Debug/
+x64/
+*.tlog
+*.log
+*.res
+*.idb
+*.pdb
+*.ilk
+
 # SDL2
 SDL2/
 
