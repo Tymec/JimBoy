@@ -17,12 +17,11 @@ void Cpu::cycle() {
 		opcode = read8();
 		executeInstruction();
 		//std::cout << "Instruction: " << "0x" << std::hex << (unsigned)opcode << " | " << (unsigned)read(pc) << std::dec << std::endl;
+		//std::cout << Translation[opcode] << std::endl;
 	}
 }
 
 void Cpu::executeInstruction() {
-	//std::cout << "Instruction: " << "0x" << std::hex << (unsigned)(opcode) << std::dec << std::endl;
-	//std::cout << Translation[opcode] << std::endl;
 	switch(opcode) {
 		case(0x00): OP_nop();	break;	// NOP					1b	4t
 		case(0x01): OP_ld16();	break;	// LD BC, u16			3b	12t
@@ -30,10 +29,25 @@ void Cpu::executeInstruction() {
 		case(0x03): OP_inc16();	break;	// INC BC				1b	8t
 		case(0x04): OP_inc();	break;	// INC B				1b	4t
 		case(0x05): OP_dec();	break;	// DEC B				1b	4t
-		case(0x06):	OP_ld();	break;	// LD B, u8				2b	8t		case(0x07):	OP_rlca();	break;	// RLCA					1b	4t		case(0x08):	OP_ld16();	break;	// LD (u16), SP			3b	20t		case(0x09):	OP_add16();	break;	// ADD HL, BC			1b	8t		case(0x0A):	OP_ld();	break;	// LD A, (BC)			1b	8t		case(0x0B):	OP_dec16();	break;	// DEC BC				1b	8t		case(0x0C):	OP_inc();	break;	// INC C				1b	4t		case(0x0D):	OP_dec();	break;	// DEC C				1b	4t		case(0x0E):	OP_ld();	break;	// LD C, u8				2b	8t		case(0x0F):	OP_rrca();	break;	// RRCA					1b	4t		case(0x10):	OP_stop();	break;	// STOP					2b	4t		case(0x11):	OP_ld16();	break;	// LD DE, u16			3b	12t		case(0x12):	OP_ld();	break;	// LD (DE), A			1b	8t		case(0x13):	OP_inc16();	break;	// INC DE				1b	8t		case(0x14):	OP_inc();	break;	// INC D				1b	4t		case(0x15):	OP_dec();	break;	// DEC D				1b	4t
+		case(0x06):	OP_ld();	break;	// LD B, u8				2b	8t
+		case(0x07):	OP_rlca();	break;	// RLCA					1b	4t
+		case(0x08):	OP_ld16();	break;	// LD (u16), SP			3b	20t
+		case(0x09):	OP_add16();	break;	// ADD HL, BC			1b	8t
+		case(0x0A):	OP_ld();	break;	// LD A, (BC)			1b	8t
+		case(0x0B):	OP_dec16();	break;	// DEC BC				1b	8t
+		case(0x0C):	OP_inc();	break;	// INC C				1b	4t
+		case(0x0D):	OP_dec();	break;	// DEC C				1b	4t
+		case(0x0E):	OP_ld();	break;	// LD C, u8				2b	8t
+		case(0x0F):	OP_rrca();	break;	// RRCA					1b	4t
+		case(0x10):	OP_stop();	break;	// STOP					2b	4t
+		case(0x11):	OP_ld16();	break;	// LD DE, u16			3b	12t
+		case(0x12):	OP_ld();	break;	// LD (DE), A			1b	8t
+		case(0x13):	OP_inc16();	break;	// INC DE				1b	8t
+		case(0x14):	OP_inc();	break;	// INC D				1b	4t
+		case(0x15):	OP_dec();	break;	// DEC D				1b	4t
 		case(0x16):	OP_ld();	break;	// LD D, u8				2b	8t
 		case(0x17):	OP_rla();	break;	// RLA					1b	4t
-		case(0x18):	OP_jr();	break;	// JR i8				2b	12t
+		case(0x18):	OP_jr(true);	break;	// JR i8				2b	12t
 		case(0x19):	OP_add16();	break;	// ADD HL, DE			1b	8t
 		case(0x1A):	OP_ld();	break;	// LD A, (DE)			1b	8t
 		case(0x1B): OP_dec16();	break;	// DEC DE				1b	8t
@@ -41,7 +55,7 @@ void Cpu::executeInstruction() {
 		case(0x1D): OP_inc();	break;	// DEC E				1b	4t
 		case(0x1E):	OP_ld();	break;	// LD E, u8				2b	8t
 		case(0x1F): OP_rra();	break;	// RRA					1b	4t
-		case(0x20): OP_jr();	break;	// JR NZ, i8			2b	8t-12t
+		case(0x20): OP_jr(!registers.getFlagZ());	break;	// JR NZ, i8			2b	8t-12t
 		case(0x21): OP_ld16();	break;	// LD HL, u16			3b	12t
 		case(0x22): OP_ld();	break;	// LD (HL+), A			1b	8t
 		case(0x23): OP_inc16();	break;	// INC HL				1b	8t
@@ -49,7 +63,7 @@ void Cpu::executeInstruction() {
 		case(0x25): OP_dec();	break;	// DEC H				1b	4t
 		case(0x26): OP_ld();	break;	// LD H, u8				2b	8t
 		case(0x27): OP_daa();	break;	// DAA					1b	4t
-		case(0x28): OP_jr();	break;	// JR Z, i8				2b	8t-12t
+		case(0x28): OP_jr(registers.getFlagZ());	break;	// JR Z, i8				2b	8t-12t
 		case(0x29): OP_add16();	break;	// ADD HL, HL			1b	8t
 		case(0x2A): OP_ld();	break;	// LD A, (HL+)			1b	8t
 		case(0x2B): OP_dec16();	break;	// DEC HL				1b	8t
@@ -57,7 +71,7 @@ void Cpu::executeInstruction() {
 		case(0x2D): OP_dec();	break;	// DEC L				1b	4t
 		case(0x2E): OP_ld();	break;	// LD L, u8				2b	8t
 		case(0x2F): OP_cpl();	break;	// CPL					1b	4t
-		case(0x30): OP_jr();	break;	// JR NC, i8			2b	8t-12t
+		case(0x30): OP_jr(!registers.getFlagC());	break;	// JR NC, i8			2b	8t-12t
 		case(0x31):	OP_ld16();	break;	// LD SP, u16			3b	12t
 		case(0x32): OP_ld();	break;	// LD (HL-), A			1b	8t
 		case(0x33): OP_inc16();	break;	// INC SP				1b	8t
@@ -65,7 +79,7 @@ void Cpu::executeInstruction() {
 		case(0x35): OP_dec();	break;	// DEC (HL)				1b	12t
 		case(0x36): OP_ld();	break;	// LD (HL), u8			2b	12t
 		case(0x37): OP_scf();	break;	// SCF					1b	4t
-		case(0x38): OP_jr();	break;	// JR C, i8				2b	8t-12t
+		case(0x38): OP_jr(registers.getFlagC());	break;	// JR C, i8				2b	8t-12t
 		case(0x39): OP_add16();	break;	// ADD HL, SP			1b	8t
 		case(0x3A): OP_ld();	break;	// LD A, (HL-)			1b	8t
 		case(0x3B):	OP_dec16();	break;	// DEC SP				1b	8t
@@ -162,7 +176,8 @@ void Cpu::executeInstruction() {
 		case(0x96): OP_sub();	break;	// SUB A, (HL)			1b	8t
 		case(0x97): OP_sub();	break;	// SUB A, A				1b	4t
 		case(0x98): OP_sbc();	break;	// SBC A, B				1b	4t
-		case(0x99): OP_sbc();	break;	// SBC A, C				1b	4t		case(0x9A): OP_sbc();	break;	// SBC A, D				1b	4t
+		case(0x99): OP_sbc();	break;	// SBC A, C				1b	4t
+		case(0x9A): OP_sbc();	break;	// SBC A, D				1b	4t
 		case(0x9B): OP_sbc();	break;	// SBC A, E				1b	4t
 		case(0x9C): OP_sbc();	break;	// SBC A, H				1b	4t
 		case(0x9D): OP_sbc();	break;	// SBC A, L				1b	4t
@@ -518,7 +533,8 @@ void Cpu::executeInstruction() {
 		case(0xF7):	OP_rst();	break;	// RST 30h				1b	16t
 		case(0xF8):	OP_ld16();	break;	// LD HL, SP+i8			2b	12t
 		case(0xF9): OP_ld16();	break;	// LD SP, HL			1b	8t
-		case(0xFA): OP_ld();	break;	// LD A, (u16)			3b	16t		case(0xFB):	OP_ei();	break;	// EI					1b	4t
+		case(0xFA): OP_ld();	break;	// LD A, (u16)			3b	16t
+		case(0xFB):	OP_ei();	break;	// EI					1b	4t
 		//case(0xFC):	break;
 		//case(0xFD):	break;
 		case(0xFE):	OP_cp();	break;	// CP A, u8				2b	8t
@@ -543,4 +559,302 @@ uint16_t Cpu::read16() {
 	uint8_t loByte = read8();
 	uint8_t hiByte = read8();
 	return (hiByte << 8) | loByte;
+}
+
+// NOP: No operation
+// Opcodes: 0x00
+void Cpu::OP_nop() {
+	return;
+}
+
+// STOP: Enter CPU very low power mode
+// Opcodes: 0x10
+void Cpu::OP_stop() {
+	lowPowerMode = true;
+}
+
+// JR: Relative Jump
+void Cpu::OP_jr(bool cc) {
+	uint8_t e = read8();
+	if (cc) {
+		pc += e;
+	}
+}
+
+// LD 16-Bit: Load value into register
+void Cpu::OP_ld16() {
+	switch(opcode) {
+		//LD BC, u16
+		case(0x01):
+			uint8_t e = read16();
+			registers.setBC(e);
+			break;
+		//LD (u16), SP
+		case(0x08):
+			uint8_t e = read16();
+			write(e, sp & 0x00FF);
+			write(e + 1, sp >> 8);
+			break;
+		//LD DE, u16
+		case(0x11):
+			uint8_t e = read16();
+			registers.setDE(e);
+			break;
+		//LD HL, u16 
+		case(0x21):
+			uint8_t e = read16();
+			registers.setHL(e);
+			break;
+		//LD SP, u16
+		case(0x31):
+			uint8_t e = read16();
+			sp = e;
+			break;
+		//LD HL,SP+i8
+		case(0xF8):
+			uint8_t e = read8();
+			registers.setHL(sp + e);
+			registers.setFlagH(sp + e, sp, e);
+			registers.setFlagC(sp + e);
+			break;
+		//LD SP, HL
+		case(0xF9):
+			sp = registers.getHL();
+			break;
+	}
+}
+
+// LD 8-Bit: Load value into register.
+// Opcodes: 0x40-0x7F (Except 0x76), 0x02, 0x12, 0x22, 0x32, 0x06, 0x16, 0x26, 0x36, 0x0A, 0x1A, 0x2A, 0x3A, 0x0E, 0x1E, 0x2E, 0x3E, 0xE0, 0xF0, 0xE2, 0xF2, 0xEA, 0xFA
+void Cpu::OP_ld() {
+}
+
+// INC 16-Bit: Increment value in register by 1
+void Cpu::OP_inc16() {
+	switch(opcode) {
+		// INC BC
+		case(0x03):
+			registers.setBC(registers.getBC() + 1);
+			break;
+		// INC DE
+		case(0x13):
+			registers.setDE(registers.getDE() + 1);
+			break;
+		// INC HL
+		case(0x23):
+			registers.setHL(registers.getHL() + 1);
+			break;
+		// INC SP
+		case(0x33):
+			sp += 1;
+			break;
+	}
+}
+
+// INC 8-Bit: Increment value in register r8 by 1.
+// Opcodes: 0x04, 0x14, 0x24, 0x34, 0x0C, 0x1C, 0x2C, 0x3C
+void Cpu::OP_inc() {
+
+}
+
+// DEC 8-Bit: Decrement value in register r8 by 1.
+// Opcodes: 0x05, 0x15, 0x25, 0x35, 0x0D, 0x1D, 0x2D, 0x3D
+void Cpu::OP_dec() {
+}
+
+// RLCA: Rotate register A left. C <- [7 <- 0] <- [7]
+// Opcodes: 0x07
+void Cpu::OP_rlca() {
+}
+
+// RLA: Rotate register A left through carry. C <- [7 <- 0] <- C
+// Opcodes: 0x17
+void Cpu::OP_rla() {
+}
+
+// DAA: Decimal Adjust Accumulator to get a correct BCD representation after an arithmetic instruction. 
+// Opcodes: 0x27
+void Cpu::OP_daa() {
+}
+
+// SCF: Set Carry Flag.
+// Opcodes: 0x37
+void Cpu::OP_scf() {
+}
+
+// ADD 16-Bit: Add the value in r16 to HL.
+// Opcodes: 0x09, 0x19, 0x29, 0x39
+void Cpu::OP_add16() {
+}
+
+// DEC 16-Bit: Decrement value in register r16 by 1.
+// Opcodes: 0x0B, 0x1B, 0x2B, 0x3B
+void Cpu::OP_dec16() {
+}
+
+// RRCA: Rotate register A right. [0] -> [7 -> 0] -> C
+// Opcodes: 0x0F
+void Cpu::OP_rrca() {
+}
+
+// RRA: Rotate register A right through carry. C -> [7 -> 0] -> C
+// Opcodes: 0x1F
+void Cpu::OP_rra() {
+}
+
+// CPL: ComPLement accumulator (A = ~A). 
+// Opcodes: 0x2F
+void Cpu::OP_cpl() {
+}
+
+// CCF: Complement Carry Flag. 
+// Opcodes: 0x3F
+void Cpu::OP_ccf() {
+}
+
+// HALT: Enter CPU low-power consumption mode until an interrupt occurs.
+void Cpu::OP_halt() {
+	lowPowerMode = true;
+}
+
+// ADD 8-Bit: Add value to A. 
+// Opcodes: 0x80 - 0x87, 0xC6
+void Cpu::OP_add() {
+}
+
+// ADC 8-Bit: Add the value in r8 plus the carry flag to A.
+// Opcodes: 0x88 - 0x8F, 0xCE
+void Cpu::OP_adc() {
+}
+
+// SUB 8-Bit: Subtract the value in r8 from A. 
+// Opcodes: 0x90 - 0x97, 0xD6
+void Cpu::OP_sub() {
+}
+
+// SBC 8-Bit: Subtract the value in r8 and the carry flag from A. 
+// Opcodes: 0x98 - 0x9F, 0xDE
+void Cpu::OP_sbc() {
+}
+
+// AND 8-Bit: Bitwise AND between the value in r8 and A. 
+// Opcodes: 0xA0 - 0xA7, 0xE6
+void Cpu::OP_and() {
+}
+
+// XOR 8-Bit: Bitwise XOR between the value in r8 and A. 
+// Opcodes: 0xA8 - 0xAF, 0xEE
+void Cpu::OP_xor() {
+}
+
+// OR 8-Bit: Store into A the bitwise OR of the value in r8 and A.
+// Opcodes: 0xB0 - 0xB7, 0xF6
+void Cpu::OP_or() {
+}
+
+// CP 8-Bit: Subtract the value in r8 from A and set flags accordingly, but don't store the result. This is useful for ComParing values. 
+// Opcodes: 0xB8 - 0xBF, 0xFE
+void Cpu::OP_cp() {
+}
+
+// RET: Return from subroutine. This is basically a POP PC (if such an instruction existed).
+// Opcodes: 0xC0, 0xD0, 0xC8, 0xD8, 0xC9
+void Cpu::OP_ret() {
+}
+
+// POP 16-Bit: Pop register r16 from the stack.
+// Opcodes: 0xC1, 0xD1, 0xE1, 0xF1
+void Cpu::OP_pop() {
+}
+
+// JP: Jump to address n16; effectively, store n16 into PC. 
+// Opcodes: 0xC2, 0xD2, 0xC3, 0xE9, 0xCA, 0xDA
+void Cpu::OP_jp() {
+}
+
+// DI: Disable Interrupts by clearing the IME flag. 
+// Opcodes: 0xF3
+void Cpu::OP_di() {
+}
+
+// CALL: Call address.
+// Opcodes: 0xC4, 0xD4, 0xCC, 0xDC, 0xCD
+void Cpu::OP_call() {
+}
+
+// PUSH 16-Bit: Push register into the stack.
+// Opcodes: 0xC5, 0xD5, 0xE5, 0xF5
+void Cpu::OP_push() {
+}
+
+// RST: Call address vec.
+// Opcodes: 0xC7, 0xD7, 0xE7, 0xF7, 0xCF, 0xDF, 0xEF, 0xFF
+void Cpu::OP_rst() {
+}
+
+// RETI: Return from subroutine and enable interrupts.
+// Opcodes: 0xD9
+void Cpu::OP_reti() {
+}
+
+// EI: Enable Interrupts by setting the IME flag. The flag is only set after the instruction following EI. 
+// Opcodes: 0xFB
+void Cpu::OP_ei() {
+}
+
+// RLC: Rotate register r8 left. C <- [7 <- 0] <- [7]
+// Opcodes: 0x00 - 0x07
+void Cpu::OP_rlc() {
+}
+
+// RRC: Rotate register r8 right. [0] -> [7 -> 0] -> C
+// Opcodes: 0x08 - 0x0F
+void Cpu::OP_rrc() {
+}
+
+// RL: Rotate bits in register r8 left through carry. C <- [7 <- 0] <- C
+// Opcodes: 0x10 - 0x17
+void Cpu::OP_rl() {
+}
+
+// RR: Rotate register r8 right through carry. C -> [7 -> 0] -> C
+// Opcodes: 0x18 - 0x1F
+void Cpu::OP_rr() {
+}
+
+// SLA: Shift Left Arithmetic register r8. C <- [7 <- 0] <- 0
+// Opcodes: 0x20 - 0x27
+void Cpu::OP_sla() {
+}
+
+// SRA: Shift Right Arithmetic register r8. [7] -> [7 -> 0] -> C
+// Opcodes: 0x28 - 0x2F
+void Cpu::OP_sra() {
+}
+
+// SWAP: Swap upper 4 bits in register r8 and the lower 4 ones. 
+// Opcodes: 0x30 - 0x37
+void Cpu::OP_swap() {
+}
+
+// SRL: Shift Right Logic register r8. 0 -> [7 -> 0] -> C
+// Opcodes: 0x38 - 0x3F
+void Cpu::OP_srl() {
+}
+
+// BIT: Test bit in register, set the zero flag if bit not set
+void Cpu::OP_bit(uint8_t v, uint8_t reg) {
+	registers.setFlagZ(reg);
+	registers.setFlagN(false);
+    registers.setFlagH(0xFF, 0x00, 0x00);
+}
+
+// RES: Set bit in register to 0.
+// Opcodes: 0x80 - 0xBF
+void Cpu::OP_res() {
+}
+
+// SET: Set bit in register to 1. 
+// Opcodes: 0xC0 - 0xFF
+void Cpu::OP_set() {
 }

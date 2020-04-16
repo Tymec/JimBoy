@@ -2,10 +2,10 @@
 #include <iostream>
 #include <fstream>
 
-const uint8_t ZERO_FLAG_POSITION = 0x7;
-const uint8_t ADD_SUB_FLAG_POSITION = 0x6;
-const uint8_t HALF_CARRY_FLAG_POSITION = 0x5;
-const uint8_t CARRY_FLAG_POSITION = 0x4;
+const uint8_t ZERO_FLAG_POSITION = 0x80;
+const uint8_t SUB_FLAG_POSITION = 0x40;
+const uint8_t HALF_FLAG_POSITION = 0x20;
+const uint8_t CARRY_FLAG_POSITION = 0x10;
 
 struct Registers {
 	uint8_t a{}; // Accumulator Register
@@ -25,7 +25,7 @@ struct Registers {
 	// Sets AF Register
 	void setAF(uint16_t value) {
 		a = (value & 0xFF00u) >> 8u;
-		f = value & 0x00FFu;
+		f = value & 0x00F0u;
 	};
 	
 	// Returns BC Register
@@ -61,21 +61,60 @@ struct Registers {
 		l = value & 0x00FFu;
 	};
 
-};
+	// Get ZERO Flag | 0x80
+	bool getFlagZ() {
+		return getFlag(ZERO_FLAG_POSITION);
+	}
 
-struct FlagsRegister {
-	bool zf{}; // Zero Flag
-	bool n{}; // Add/Sub-Flag (BCD)
-	bool h{}; // Half Carry Flag (BCD)
-	bool cy{}; // Carry Flag
+	// Set ZERO Flag | 0x80
+	void setFlagZ(uint16_t value) {
+		bool v = (value & 0xFFFF);
+		setFlag(ZERO_FLAG_POSITION, !v);
+	}
 
-	uint8_t getFlags() {
-		return (
-			(zf << ZERO_FLAG_POSITION) | 
-			(n << ADD_SUB_FLAG_POSITION) | 
-			(h << HALF_CARRY_FLAG_POSITION) | 
-			(cy << CARRY_FLAG_POSITION));
-	};
+	// Get SUB Flag | 0x40
+	bool getFlagN() {
+		return getFlag(SUB_FLAG_POSITION);
+	}
+
+	// Set SUB Flag | 0x40
+	void setFlagN(bool v) {
+		setFlag(SUB_FLAG_POSITION, v);
+	}
+
+	// Get HALF CARRY Flag | 0x20
+	bool getFlagH() {
+		return getFlag(HALF_FLAG_POSITION);
+	}
+
+	// Set HALF CARRY Flag | 0x20
+	void setFlagH(uint16_t value, uint16_t old, uint16_t diff) {
+		bool v = (old ^ diff ^ value) & 0x10;
+		setFlag(HALF_FLAG_POSITION, v);
+	}
+
+	// Get CARRY Flag | 0x10
+	bool getFlagC() {
+		return getFlag(CARRY_FLAG_POSITION);
+	}
+
+	// Set CARRY Flag | 0x10
+	void setFlagC(uint16_t value) {
+		if (value & 0xFF00u) {
+			setFlag(CARRY_FLAG_POSITION, value > 0xFFFFu);
+		} else {
+			setFlag(CARRY_FLAG_POSITION, value > 0xFFu);
+		}
+	}
+
+private:
+	bool getFlag(uint8_t pos) {
+		return (f & pos) != 0;
+	}
+
+	void setFlag(uint8_t pos, bool val) {
+		f = val ? (f | pos) : (f & ~pos);
+	}
 };
 
 class MemoryController;
@@ -92,7 +131,6 @@ private:
 	uint16_t sp{}; // Stack Pointer
 	uint16_t pc{}; // Program Counter
 	Registers registers; // Registers
-	FlagsRegister flags; // Flags
 	uint8_t cycles{}; // Cycles
 
 	bool lowPowerMode{}; // Low Power Mode
@@ -141,7 +179,7 @@ private:
 	void OP_di();
 	void OP_ei();
 	void OP_jp();
-	void OP_jr();
+	void OP_jr(bool cc);
 	void OP_call();
 	void OP_ret();
 	void OP_reti();
@@ -155,7 +193,7 @@ private:
 	void OP_swap();
 	void OP_sra();
 	void OP_srl();
-	void OP_bit();
+	void OP_bit(uint8_t v, uint8_t reg);
 	void OP_set();
 	void OP_res();
 };

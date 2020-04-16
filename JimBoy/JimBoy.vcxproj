@@ -157,7 +157,6 @@
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Memory.cpp" />
-    <ClCompile Include="Opcodes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disassembler.h" />
