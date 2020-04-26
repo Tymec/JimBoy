@@ -11,10 +11,10 @@ void MemoryController::InsertCartridge(char const* file_path) {
 }
 
 uint8_t MemoryController::read(uint16_t address) {
-	if (address <= 0x3FFF) {
+    if (address <= 0x3FFF) {
 	 	return cartridge->readRom(address);
 	} else if (address <= 0x7FFF) {
-		return cartridge->readRom(address + 0x4000);
+		return cartridge->readRom(address);
 	} else if (address <= 0x9FFF) {
 		return memory.readVRam(address & 0x1FFF);
 	} else if (address <= 0xBFFF) {
@@ -31,12 +31,10 @@ uint8_t MemoryController::read(uint16_t address) {
 		return 0x00;
 	} else if (address <= 0xFF7F) {
 		return memory.readIo(address & 0x7F);
-	} else if (address <= 0xFFFE) {
-		return memory.readHRam(address & 0x7E);
 	} else if (address <= 0xFFFF) {
-		return memory.readIe();
+		return memory.readHRam(address & 0x7F);
 	}
-	return 0xFF;
+	return 0x00;
 }
 
 void MemoryController::write(uint16_t address, uint8_t value) {
@@ -60,9 +58,7 @@ void MemoryController::write(uint16_t address, uint8_t value) {
 		return;
 	} else if (address <= 0xFF7F) {
 		memory.writeIo(address & 0x7F, value);
-	} else if (address <= 0xFFFE) {
-		memory.writeHRam(address & 0x7E, value);
 	} else if (address <= 0xFFFF) {
-		memory.writeIe(value);
+		memory.writeHRam(address & 0x7F, value);
 	}
 }

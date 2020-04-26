@@ -57,6 +57,8 @@ public:
 	uint8_t readERam(uint16_t address);
 	// Write value to External RAM at address
 	void writeERam(uint16_t address, uint8_t value);
+    
+    bool is_bootrom_enabled = true; // Is Boot ROM Enabled
 private:
 	// Load ROM into ROM Bank
 	void LoadRom(char const* filePath);
@@ -66,7 +68,8 @@ private:
 	MemoryController *memoryController; // Pointer to Bus
 	CartridgeInfo cartInfo{}; // CartridgeInfo
 
-	uint8_t rom[0x8000]{}; // 16KB ROM Bank 00
+	uint8_t rom[0x8000]{}; // 32KB ROM Bank
+    uint8_t bootrom[0x4000]{}; // 16KB Boot ROM
 	uint8_t eram[EXTERNAL_RAM_SIZE]{}; // 8KB External RAM
 };
 

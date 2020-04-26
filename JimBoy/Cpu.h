@@ -7,6 +7,16 @@ const uint8_t SUB_FLAG_POSITION = 0x40;
 const uint8_t HALF_FLAG_POSITION = 0x20;
 const uint8_t CARRY_FLAG_POSITION = 0x10;
 
+const uint16_t IF_REGISTER_ADDRESS = 0xFF0F;
+const uint16_t IE_REGISTER_ADDRESS = 0xFFFF;
+
+enum FLAGS {
+	ZERO = 0x80,
+	SUB = 0x40,
+	HALF = 0x20,
+	CARRY = 0x10
+};
+
 struct Registers {
 	uint8_t a{}; // Accumulator Register
 	uint8_t b{}; // B Register
@@ -61,59 +71,14 @@ struct Registers {
 		l = value & 0x00FFu;
 	};
 
-	// Get ZERO Flag | 0x80
-	bool getFlagZ() {
-		return getFlag(ZERO_FLAG_POSITION);
+	// Get Flag
+	bool getFlag(FLAGS flag) {
+		return (f & flag) != 0;
 	}
 
-	// Set ZERO Flag | 0x80
-	void setFlagZ(uint16_t value) {
-		bool v = (value & 0xFFFF);
-		setFlag(ZERO_FLAG_POSITION, !v);
-	}
-
-	// Get SUB Flag | 0x40
-	bool getFlagN() {
-		return getFlag(SUB_FLAG_POSITION);
-	}
-
-	// Set SUB Flag | 0x40
-	void setFlagN(bool v) {
-		setFlag(SUB_FLAG_POSITION, v);
-	}
-
-	// Get HALF CARRY Flag | 0x20
-	bool getFlagH() {
-		return getFlag(HALF_FLAG_POSITION);
-	}
-
-	// Set HALF CARRY Flag | 0x20
-	void setFlagH(uint16_t value, uint16_t old, uint16_t diff) {
-		bool v = (old ^ diff ^ value) & 0x10;
-		setFlag(HALF_FLAG_POSITION, v);
-	}
-
-	// Get CARRY Flag | 0x10
-	bool getFlagC() {
-		return getFlag(CARRY_FLAG_POSITION);
-	}
-
-	// Set CARRY Flag | 0x10
-	void setFlagC(uint16_t value) {
-		if (value & 0xFF00u) {
-			setFlag(CARRY_FLAG_POSITION, value > 0xFFFFu);
-		} else {
-			setFlag(CARRY_FLAG_POSITION, value > 0xFFu);
-		}
-	}
-
-private:
-	bool getFlag(uint8_t pos) {
-		return (f & pos) != 0;
-	}
-
-	void setFlag(uint8_t pos, bool val) {
-		f = val ? (f | pos) : (f & ~pos);
+	// Set Flag
+	void setFlag(FLAGS flag, bool value) {
+		f = value ? (f | flag) : (f & ~flag);
 	}
 };
 
@@ -133,10 +98,13 @@ private:
 	Registers registers; // Registers
 	uint8_t cycles{}; // Cycles
 
-	bool lowPowerMode{}; // Low Power Mode
+	bool ime{}; // Interrupt Master Enable Flag 
+	bool halted{}; // Is CPU halted
 
 	// Execute current instruction
 	void executeInstruction();
+	// Tick
+	void tick();
 
 	// Read & Write the Bus
 	uint8_t read(uint16_t address);
@@ -147,30 +115,30 @@ private:
 	uint16_t read16();
 
 	/// Opcodes
-	void OP_ld();
-	void OP_ld16();
-	void OP_push();
-	void OP_pop();
-	void OP_add();
-	void OP_adc();
-	void OP_sub();
-	void OP_sbc();
-	void OP_and();
-	void OP_xor();
-	void OP_or();
-	void OP_cp();
-	void OP_inc();
-	void OP_dec();
+	uint8_t OP_ld(uint8_t v);
+	void OP_ld16(uint16_t v);
+	void OP_push(uint16_t v);
+	uint8_t OP_pop();
+	void OP_add(uint8_t v);
+	void OP_adc(uint8_t v);
+	void OP_sub(uint8_t v);
+	void OP_sbc(uint8_t v);
+	void OP_and(uint8_t v);
+	void OP_xor(uint8_t v);
+	void OP_or(uint8_t v);
+	void OP_cp(uint8_t v);
+	uint8_t OP_inc(uint8_t v);
+	uint8_t OP_dec(uint8_t v);
 	void OP_daa();
 	void OP_cpl();
-	void OP_add16();
-	void OP_inc16();
-	void OP_dec16();
+	uint16_t OP_add16(uint16_t reg, uint16_t v);
+	uint16_t OP_inc16(uint16_t v);
+	uint16_t OP_dec16(uint16_t v);
 	//void OP_ld16();
-	void OP_rlca();
-	void OP_rla();
-	void OP_rrca();
-	void OP_rra();
+	uint8_t OP_rlca();
+	uint8_t OP_rla();
+	uint8_t OP_rrca();
+	uint8_t OP_rra();
 	void OP_ccf();
 	void OP_scf();
 	void OP_nop();
@@ -178,22 +146,22 @@ private:
 	void OP_stop();
 	void OP_di();
 	void OP_ei();
-	void OP_jp();
+	void OP_jp(bool cc);
 	void OP_jr(bool cc);
-	void OP_call();
-	void OP_ret();
+	void OP_call(bool cc);
+	void OP_ret(bool cc);
 	void OP_reti();
-	void OP_rst();
+	void OP_rst(uint8_t v);
 	// CB-Prefix
-	void OP_rlc();
-	void OP_rl();
-	void OP_rrc();
-	void OP_rr();
-	void OP_sla();
-	void OP_swap();
-	void OP_sra();
-	void OP_srl();
+	uint8_t OP_rlc(uint8_t reg);
+	uint8_t OP_rl(uint8_t reg);
+	uint8_t OP_rrc(uint8_t reg);
+	uint8_t OP_rr(uint8_t reg);
+	uint8_t OP_sla(uint8_t reg);
+	uint8_t OP_swap(uint8_t reg);
+	uint8_t OP_sra(uint8_t reg);
+	uint8_t OP_srl(uint8_t reg);
 	void OP_bit(uint8_t v, uint8_t reg);
-	void OP_set();
-	void OP_res();
+	uint8_t OP_set(uint8_t v, uint8_t reg);
+	uint8_t OP_res(uint8_t v, uint8_t reg);
 };

@@ -110,6 +110,10 @@ void Cartridge::GetHeader(char* buffer) {
 }
 
 uint8_t Cartridge::readRom(uint16_t address) {
+    if (address <= 0x3FFF && cartridge->is_bootrom_enabled) {
+        return bootrom[address];
+    }
+    
 	return rom[address];
 }
 

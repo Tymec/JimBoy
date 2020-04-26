@@ -157,15 +157,21 @@
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Opcodes.cpp" />
+    <ClCompile Include="Ppu.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disassembler.h" />
+    <ClInclude Include="Helper.h" />
     <ClInclude Include="MemoryController.h" />
     <ClInclude Include="Cartridge.h" />
     <ClInclude Include="Cpu.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Memory.h" />
+    <ClInclude Include="Ppu.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
