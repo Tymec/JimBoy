@@ -11,7 +11,6 @@ A project that I'm working on in my spare time as a hobby project
   - [GCISheet](http://www.devrs.com/gb/files/GBCPU_Instr.html)
   - [GBZ80](https://rednex.github.io/rgbds/gbz80.7.html)
   - [gbops](https://izik1.github.io/gbops/index.html)
-  - [The Ultimate Game Boy Talk](https://www.youtube.com/watch?v=HyzD8pNlpwI)
   - [awesome-gbdev](https://github.com/gbdev/awesome-gbdev)
   - [gbctr.pdf](https://gekkio.fi/files/gb-docs/gbctr.pdf)
 - ##### Code (in case I'm stuck):
