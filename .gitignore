@@ -49,6 +49,8 @@ SDL2/
 
 # Roms
 *.gb
+*.bin
+Roms/
 
 # Documents
 *.pdf
