@@ -2,3 +2,17 @@
 ## JimBoy
 ### A GameBoy Emulator
 A project that I'm working on in my spare time as a hobby project
+
+---
+#### References:
+- ##### Documentation:
+  - [Pandocs](https://gbdev.io/pandocs)
+  - [GCISheet](http://www.devrs.com/gb/files/GBCPU_Instr.html)
+  - [GBZ80](https://rednex.github.io/rgbds/gbz80.7.html)
+  - [gbops](https://izik1.github.io/gbops/index.html)
+  - [gbctr.pdf](https://gekkio.fi/files/gb-docs/gbctr.pdf)
+  - [awesome-gbdev](https://github.com/gbdev/awesome-gbdev)
+- ##### Code (in case I'm stuck):
+  - [ProjectDMG](https://github.com/BluestormDNA/ProjectDMG)
+  - [PyBoy](https://github.com/Baekalfen/PyBoy)
+  - [NicoGB](https://github.com/nicoeps/NicoGB)
