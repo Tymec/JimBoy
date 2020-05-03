@@ -120,5 +120,8 @@
     <Image Include="..\JimBoy.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="JimBoy.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
