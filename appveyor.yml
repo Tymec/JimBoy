@@ -1,0 +1,28 @@
+version: 0.0.{build}
+configuration: Debug
+platform: x64
+
+install:
+  # SDL2
+  - ps: appveyor DownloadFile 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
+  - ps: Expand-Archive 'SDL2-devel-2.0.12-VC.zip' -DestinationPath .\JimBoy\
+  - ps: mv .\JimBoy\SDL2-2.0.12\ .\JimBoy\SDL2
+  - ps: cp .\JimBoy\SDL2\lib\x64\SDL2.dll .\JimBoy\
+  # ImGui
+  - ps: cd .\JimBoy\
+  - ps: appveyor DownloadFile 'https://github.com/ocornut/imgui/archive/v1.76.zip'
+  - ps: Expand-Archive 'v1.76.zip' -DestinationPath .\
+  - ps: mv .\imgui-1.76\ .\imgui
+  - ps: Remove-Item –path .\imgui\examples\ –recurse
+  # ImGui_SDL
+  - ps: appveyor DownloadFile 'https://github.com/Tyyppi77/imgui_sdl/archive/master.zip'
+  - ps: Expand-Archive 'master.zip' -DestinationPath .\
+  - ps: mv .\imgui_sdl-master\imgui_sdl.h .\imgui
+  - ps: mv .\imgui_sdl-master\imgui_sdl.cpp .\imgui
+  # ImGui_Club
+  - ps: appveyor DownloadFile 'https://raw.githubusercontent.com/ocornut/imgui_club/master/imgui_memory_editor/imgui_memory_editor.h'
+  - ps: mv .\imgui_memory_editor.h .\imgui
+build:
+  verbosity: minimal
+artifacts:
+- path: jimboy%config_name%%APPVEYOR_BUILD_VERSION%-win_x64.zip
