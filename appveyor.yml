@@ -1,7 +1,6 @@
 version: 0.0.{build}
 configuration: Debug
 platform: x64
-
 install:
   # SDL2
   - ps: appveyor DownloadFile 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
@@ -22,7 +21,14 @@ install:
   # ImGui_Club
   - ps: appveyor DownloadFile 'https://raw.githubusercontent.com/ocornut/imgui_club/master/imgui_memory_editor/imgui_memory_editor.h'
   - ps: mv .\imgui_memory_editor.h .\imgui
+  - ps: cd ..
 build:
   verbosity: minimal
+after_build:
+  - ps: cp .\JimBoy\SDL2\lib\x64\SDL2.dll .\$env:platform\$env:configuration\
+  - ps: ls
 artifacts:
-- path: jimboy%config_name%%APPVEYOR_BUILD_VERSION%-win_x64.zip
+  - path: .\$(platform)\$(configuration)
+    name: JimBoy-%APPVEYOR_BUILD_VERSION%-$(configuration)$(platform)
+  - path: .\$(platform)\$(configuration)\
+    name: JimBoy-%APPVEYOR_BUILD_VERSION%-$(configuration)-win_$(platform)
