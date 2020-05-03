@@ -47,6 +47,10 @@ x64/
 # SDL2
 SDL2/
 
+# ImGui
+imgui/
+imgui.ini
+
 # Roms
 *.gb
 *.bin
@@ -55,3 +59,4 @@ Roms/
 # Documents
 *.pdf
 *.psd
+Utils/output

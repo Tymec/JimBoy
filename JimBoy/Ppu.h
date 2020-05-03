@@ -1,20 +1,33 @@
 #pragma once
 #include <iostream>
 
+enum ppuRegister {
+	LCDC = 0xFF40,	// LCD Control
+	STAT = 0xFF41,	// LCDC Status
+	SCY = 0xFF42,	// Scroll Y
+	SCX = 0xFF43,	// Scroll X
+	LY = 0xFF44,	// LCDC Y-Coordinate
+	LYC = 0xFF45,	// LY Compare
+	WY = 0xFF4A,	// Window Y Position
+	WX = 0xFF4B,	// Window X Position
+	BGP = 0xFF47,	// BG Palette Data
+	OBP0 = 0xFF48,	// Object Palette 0 Data
+	OBP1 = 0xFF49,	// Object Palette 1 Data
+	DMA = 0xFF46	// DMA Transfer & Start Address
+};
+
+class MemoryController;
 class Ppu {
 public:
+	Ppu(MemoryController *memoryController);
+	~Ppu();
+	
+	uint32_t framebuffer[160 * 144]{};
+	uint8_t getRegister(ppuRegister reg);
 private:
-	// PPU Registers
-	uint8_t lcdc{}; // LCD Control
-	uint8_t stat{}; // LCDC Status
-	uint8_t scy{}; // Scroll Y
-	uint8_t scx{}; // Scroll X
-	uint8_t ly{}; // LCDC Y-Coordinate
-	uint8_t lyc{}; // LY Compare
-	uint8_t wy{}; // Window Y Position
-	uint8_t wx{}; // Window X Position
-	uint8_t bgp{}; // BG Palette Data
-	uint8_t obp0{}; // Object Palette 0 Data
-	uint8_t obp1{}; // Object Palette 1 Data
+	uint8_t read(uint16_t address);
+	void write(uint16_t address, uint8_t value);
+
+	MemoryController *memoryController; // Pointer to MemoryController
 };
 

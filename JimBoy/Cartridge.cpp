@@ -44,7 +44,6 @@ void Cartridge::GetHeader(char* buffer) {
 	uint8_t headerEntryPoint[4];
 	for (uint8_t i = 0; i < 4; i++) {
 		headerEntryPoint[i] = buffer[0x100 + i];
-		//std::cout << std::hex << (unsigned)(unsigned char)buffer[0x100 + i] << std::dec << std::endl;
 	}
 
 	// Nintendo Logo
@@ -106,14 +105,10 @@ void Cartridge::GetHeader(char* buffer) {
 	}
 
 	// DEBUG
-	cartInfo.outputInformation();
+	//cartInfo.outputInformation();
 }
 
 uint8_t Cartridge::readRom(uint16_t address) {
-    if (address <= 0x3FFF && cartridge->is_bootrom_enabled) {
-        return bootrom[address];
-    }
-    
 	return rom[address];
 }
 

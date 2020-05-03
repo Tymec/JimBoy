@@ -1,13 +1,21 @@
 #pragma once
 #include <iostream>
 
+enum timerRegisters {
+	DIV = 0xFF04,	// Divider Register
+	TIMA = 0xFF05,	// Timer counter
+	TMA = 0xFF06,	// Timer Modulo
+	TAC = 0xFF07	// Timer Control
+};
+
+class MemoryController;
 class Timer {
 public:
+	Timer(MemoryController* memoryController);
+	~Timer();
 private:
-	// Timer and Divider Registers
-	uint8_t div{}; // Divider Register
-	uint8_t tima{}; // Timer counter
-	uint8_t tma{}; // Timer Modulo
-	uint8_t tac{}; // Timer Control
+	MemoryController* memoryController;
+
+	uint8_t getRegister(timerRegisters reg);
 };
 

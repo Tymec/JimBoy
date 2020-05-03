@@ -89,22 +89,24 @@ public:
 	~Cpu();
 
 	// Fetch, Decode & Execute
-	void cycle();
-private:
-	MemoryController *memoryController; // Pointer to MemoryController
-	uint8_t opcode{}; // Current opcode
-	uint16_t sp{}; // Stack Pointer
-	uint16_t pc{}; // Program Counter
+	unsigned Cycle();
 	Registers registers; // Registers
-	uint8_t cycles{}; // Cycles
+	uint16_t sp{}; // Stack Pointer
+	uint8_t opcode{}; // Current opcode
+	uint16_t pc{}; // Program Counter
+private:
+	friend class Debugger; // NOT SMART!!!
+	MemoryController *memoryController; // Pointer to MemoryController
 
+	bool branch{}; // If jump is branching
+	uint16_t prevPc{}; // PC when cycle began
+	bool prefix{}; // Instructions 0xCB
 	bool ime{}; // Interrupt Master Enable Flag 
 	bool halted{}; // Is CPU halted
+	bool ime_scheduled{}; // IME should be enabled after intruction
 
 	// Execute current instruction
-	void executeInstruction();
-	// Tick
-	void tick();
+	void ExecuteInstruction();
 
 	// Read & Write the Bus
 	uint8_t read(uint16_t address);
@@ -118,7 +120,7 @@ private:
 	uint8_t OP_ld(uint8_t v);
 	void OP_ld16(uint16_t v);
 	void OP_push(uint16_t v);
-	uint8_t OP_pop();
+	uint16_t OP_pop();
 	void OP_add(uint8_t v);
 	void OP_adc(uint8_t v);
 	void OP_sub(uint8_t v);
@@ -131,14 +133,14 @@ private:
 	uint8_t OP_dec(uint8_t v);
 	void OP_daa();
 	void OP_cpl();
-	uint16_t OP_add16(uint16_t reg, uint16_t v);
+	uint16_t OP_add16(uint16_t reg, uint16_t v, bool s=false);
 	uint16_t OP_inc16(uint16_t v);
 	uint16_t OP_dec16(uint16_t v);
 	//void OP_ld16();
-	uint8_t OP_rlca();
-	uint8_t OP_rla();
-	uint8_t OP_rrca();
-	uint8_t OP_rra();
+	void OP_rlca();
+	void OP_rla();
+	void OP_rrca();
+	void OP_rra();
 	void OP_ccf();
 	void OP_scf();
 	void OP_nop();

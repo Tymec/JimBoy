@@ -10,7 +10,11 @@ void MemoryController::InsertCartridge(char const* file_path) {
 	cartridge = new Cartridge(this, file_path);
 }
 
-uint8_t MemoryController::read(uint16_t address) {
+uint8_t MemoryController::cpuRead(uint16_t address) {
+	if (bootrom != nullptr && address < 0x100) {
+		return bootrom[address];
+	}
+
     if (address <= 0x3FFF) {
 	 	return cartridge->readRom(address);
 	} else if (address <= 0x7FFF) {
@@ -37,11 +41,11 @@ uint8_t MemoryController::read(uint16_t address) {
 	return 0x00;
 }
 
-void MemoryController::write(uint16_t address, uint8_t value) {
+void MemoryController::cpuWrite(uint16_t address, uint8_t value) {
 	if (address <= 0x3FFF) {
-		cartridge->writeRom(address, value); // Replace with Rom0
+		//cartridge->writeRom(address, value); // Replace with Rom0
 	} else if (address <= 0x7FFF) {
-		cartridge->writeRom(address, value); // Replace with Rom1
+		//cartridge->writeRom(address, value); // Replace with Rom1
 	} else if (address <= 0x9FFF) {
 		memory.writeVRam(address & 0x1FFF, value);
 	} else if (address <= 0xBFFF) {
@@ -61,4 +65,20 @@ void MemoryController::write(uint16_t address, uint8_t value) {
 	} else if (address <= 0xFFFF) {
 		memory.writeHRam(address & 0x7F, value);
 	}
+}
+
+uint8_t MemoryController::ppuRead(uint16_t address) {
+	return 0x00;
+}
+
+void MemoryController::ppuWrite(uint16_t address, uint8_t value) {
+
+}
+
+void MemoryController::insertBootrom(uint8_t* bootrom) {
+	this->bootrom = bootrom;
+}
+
+bool MemoryController::isBootromEnabled() {
+	return (cpuRead(0xFF50) & 0x1) == 0;
 }

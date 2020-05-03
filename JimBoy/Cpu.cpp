@@ -1,30 +1,37 @@
 #include "Cpu.h"
 #include "MemoryController.h"
-#include "Disassembler.h"
+#include "Types.h"
 
 Cpu::Cpu(MemoryController *memoryController) {
 	this->memoryController = memoryController;
-
-	// DEBUG
-	pc = 0x100;
 }
 
 Cpu::~Cpu() {
 }
 
-void Cpu::cycle() {
-	if (cycles == 0) {
-		if (halted) {
-			return;
-		}
+unsigned Cpu::Cycle() {
+	prefix = false;
+	branch = false;
+
+	if (!halted) {
+		prevPc = pc;
 		opcode = read8();
-		executeInstruction();
-		//std::cout << "Instruction: " << "0x" << std::hex << (unsigned)opcode << " | " << (unsigned)read(pc) << std::dec << std::endl;
-		//std::cout << Translation[opcode] << std::endl;
+		if (opcode == 0xCB)
+			prefix = true;
+
+		ExecuteInstruction();
+
+		if (ime_scheduled && opcode != 0xFB) {
+			ime_scheduled = false;
+			ime = true;
+		}
+		//std::cout << getInstruction(opcode, prefix).c_str() << std::endl;
+		return getCycle(opcode, prefix, branch);
 	}
+	return 4;
 }
 
-void Cpu::executeInstruction() {
+void Cpu::ExecuteInstruction() {
 	switch(opcode) {
 		case(0x00): OP_nop();											break;	// NOP					1b	4t
 		case(0x01): registers.setBC(read16());							break;	// LD BC, u16			3b	12t
@@ -50,7 +57,7 @@ void Cpu::executeInstruction() {
 		case(0x15):	registers.d = OP_dec(registers.d);					break;	// DEC D				1b	4t
 		case(0x16):	registers.d = read8();								break;	// LD D, u8				2b	8t
 		case(0x17):	OP_rla();											break;	// RLA					1b	4t
-		case(0x18):	OP_jr(true);										break;	// JR i8				2b	12t
+		case(0x18):	OP_jr(true);										break;	// JR e8				2b	12t
 		case(0x19):	registers.setHL(OP_add16(registers.getHL(), registers.getDE()));	break;	// ADD HL, DE			1b	8t
 		case(0x1A):	registers.a = read(registers.getDE());				break;	// LD A, (DE)			1b	8t
 		case(0x1B): registers.setDE(OP_dec16(registers.getDE()));		break;	// DEC DE				1b	8t
@@ -58,37 +65,37 @@ void Cpu::executeInstruction() {
 		case(0x1D): registers.e = OP_dec(registers.e);					break;	// DEC E				1b	4t
 		case(0x1E): registers.e = read8();								break;	// LD E, u8				2b	8t
 		case(0x1F): OP_rra();											break;	// RRA					1b	4t
-		case(0x20): OP_jr(!registers.getFlag(FLAGS::ZERO));				break;	// JR NZ, i8			2b	8t-12t
+		case(0x20): OP_jr(!registers.getFlag(ZERO));				break;	// JR NZ, e8			2b	8t-12t
 		case(0x21): registers.setHL(read16());							break;	// LD HL, u16			3b	12t
-		case(0x22): write(registers.getHL() + 1, registers.a);			break;	// LD (HL+), A			1b	8t
+		case(0x22): write(registers.getHL(), registers.a); registers.setHL(registers.getHL() + 1);			break;	// LD (HL+), A			1b	8t
 		case(0x23): registers.setHL(OP_inc16(registers.getHL()));		break;	// INC HL				1b	8t
 		case(0x24): registers.h = OP_inc(registers.h);					break;	// INC H				1b	4t
 		case(0x25): registers.h = OP_dec(registers.h);					break;	// DEC H				1b	4t
 		case(0x26): registers.h = read8();								break;	// LD H, u8				2b	8t
 		case(0x27): OP_daa();											break;	// DAA					1b	4t
-		case(0x28): OP_jr(registers.getFlag(FLAGS::ZERO));				break;	// JR Z, i8				2b	8t-12t
+		case(0x28): OP_jr(registers.getFlag(ZERO));				break;	// JR Z, e8				2b	8t-12t
 		case(0x29): registers.setHL(OP_add16(registers.getHL(), registers.getHL()));	break;	// ADD HL, HL			1b	8t
-		case(0x2A): registers.a = read(registers.getHL() + 1);			break;	// LD A, (HL+)			1b	8t
+		case(0x2A): registers.a = read(registers.getHL()); registers.setHL(registers.getHL() + 1);			break;	// LD A, (HL+)			1b	8t
 		case(0x2B): registers.setHL(OP_dec16(registers.getHL()));		break;	// DEC HL				1b	8t
 		case(0x2C): registers.l = OP_inc(registers.l);					break;	// INC L				1b	4t
 		case(0x2D): registers.l = OP_dec(registers.l);					break;	// DEC L				1b	4t
 		case(0x2E): registers.l = read8();								break;	// LD L, u8				2b	8t
 		case(0x2F): OP_cpl();											break;	// CPL					1b	4t
-		case(0x30): OP_jr(!registers.getFlag(FLAGS::CARRY));			break;	// JR NC, i8			2b	8t-12t
+		case(0x30): OP_jr(!registers.getFlag(CARRY));			break;	// JR NC, e8			2b	8t-12t
 		case(0x31):	sp = read16();										break;	// LD SP, u16			3b	12t
-		case(0x32): write(registers.getHL() - 1, registers.a);			break;	// LD (HL-), A			1b	8t
+		case(0x32): write(registers.getHL(), registers.a); registers.setHL(registers.getHL() - 1);			break;	// LD (HL-), A			1b	8t
 		case(0x33): sp = OP_inc16(sp);									break;	// INC SP				1b	8t
 		case(0x34): write(registers.getHL(), OP_inc(read(registers.getHL())));	break;	// INC (HL)				1b	12t
 		case(0x35): write(registers.getHL(), OP_dec(read(registers.getHL())));	break;	// DEC (HL)				1b	12t
 		case(0x36): write(registers.getHL(), read8());					break;	// LD (HL), u8			2b	12t
 		case(0x37): OP_scf();											break;	// SCF					1b	4t
-		case(0x38): OP_jr(registers.getFlag(FLAGS::CARRY));				break;	// JR C, i8				2b	8t-12t
+		case(0x38): OP_jr(registers.getFlag(CARRY));				break;	// JR C, e8				2b	8t-12t
 		case(0x39): registers.setHL(OP_add16(registers.getHL(), sp));	break;	// ADD HL, SP			1b	8t
-		case(0x3A): registers.a = read(registers.getHL() - 1);			break;	// LD A, (HL-)			1b	8t
+		case(0x3A): registers.a = read(registers.getHL()); registers.setHL(registers.getHL() - 1);			break;	// LD A, (HL-)			1b	8t
 		case(0x3B):	sp = OP_dec16(sp);									break;	// DEC SP				1b	8t
 		case(0x3C):	registers.a = OP_inc(registers.a);					break;	// INC A				1b	4t
 		case(0x3D): registers.a = OP_dec(registers.a);					break;	// DEC A				1b	4t
-		case(0x3E): registers.b = read8();								break;	// LD A, u8				2b	8t
+		case(0x3E): registers.a = read8();								break;	// LD A, u8				2b	8t
 		case(0x3F): OP_ccf();											break;	// CCF					1b	4t
 		case(0x40): registers.b = registers.b;							break;	// LD B, B				1b	4t
 		case(0x41):	registers.b = registers.c;							break;	// LD B, C				1b	4t
@@ -218,19 +225,20 @@ void Cpu::executeInstruction() {
 		case(0xBD): OP_cp(registers.l);									break;	// CP A, L				1b	4t
 		case(0xBE): OP_cp(read(registers.getHL()));						break;	// CP A, (HL)			1b	8t
 		case(0xBF): OP_cp(registers.a);									break;	// CP A, A				1b	4t
-		case(0xC0): OP_ret(!registers.getFlag(FLAGS::ZERO));			break;	// RET NZ				1b	8t-20t
+		case(0xC0): OP_ret(!registers.getFlag(ZERO));			break;	// RET NZ				1b	8t-20t
 		case(0xC1): registers.setBC(OP_pop());							break;	// POP BC				1b	12t
-		case(0xC2): OP_jp(!registers.getFlag(FLAGS::ZERO));				break;	// JP NZ, u16			3b	12t-16t
+		case(0xC2): OP_jp(!registers.getFlag(ZERO));				break;	// JP NZ, u16			3b	12t-16t
 		case(0xC3): OP_jp(true);										break;	// JP u16				3b	16t
-		case(0xC4): OP_call(!registers.getFlag(FLAGS::ZERO));			break;	// CALL NZ, u16			3b	12t-24t
+		case(0xC4): OP_call(!registers.getFlag(ZERO));			break;	// CALL NZ, u16			3b	12t-24t
 		case(0xC5):	OP_push(registers.getBC());							break;	// PUSH BC				1b	16t
 		case(0xC6): OP_add(read8());									break;	// ADD A, u8			2b	8t
 		case(0xC7): OP_rst(0x00);										break;	// RST 00h				1b	16t
-		case(0xC8): OP_ret(registers.getFlag(FLAGS::ZERO));				break;	// RET Z				1b	8t-20t
+		case(0xC8): OP_ret(registers.getFlag(ZERO));				break;	// RET Z				1b	8t-20t
 		case(0xC9): OP_ret(true);										break;	// RET					1b	16t
-		case(0xCA): OP_jp(registers.getFlag(FLAGS::ZERO));				break;	// JP Z, u16			3b	12t-16t
+		case(0xCA): OP_jp(registers.getFlag(ZERO));				break;	// JP Z, u16			3b	12t-16t
 		case(0xCB):
-			switch(read8()) {
+			opcode = read8();
+			switch(opcode) {
 				case(0x00): registers.b = OP_rlc(registers.b);			break;	// RLC B			2b	8t
 				case(0x01): registers.c = OP_rlc(registers.c);			break;	// RLC C			2b	8t
 				case(0x02): registers.d = OP_rlc(registers.d);			break;	// RLC D			2b	8t
@@ -489,23 +497,23 @@ void Cpu::executeInstruction() {
 				case(0xFF): registers.a = OP_set(0x80, registers.a);	break;	// SET 7, A		2b	8t
 				default: OP_nop();										break;	// NOP				1b	4t
 			} break;
-		case(0xCC): OP_call(registers.getFlag(FLAGS::ZERO));			break;	// CALL Z, u16			3b	12t-24t
+		case(0xCC): OP_call(registers.getFlag(ZERO));			break;	// CALL Z, u16			3b	12t-24t
 		case(0xCD): OP_call(true);										break;	// CALL u16				3b	24t
 		case(0xCE): OP_adc(read8());									break;	// ADC A, u8			2b	8t
 		case(0xCF):	OP_rst(0x08);										break;	// RST 08h				1b	16t
-		case(0xD0): OP_ret(!registers.getFlag(FLAGS::CARRY));			break;	// RET NC				1b	8t-20t
+		case(0xD0): OP_ret(!registers.getFlag(CARRY));			break;	// RET NC				1b	8t-20t
 		case(0xD1): registers.setDE(OP_pop());							break;	// POP DE				1b	12t
-		case(0xD2): OP_jp(!registers.getFlag(FLAGS::CARRY));			break;	// JP NC, u16			3b	12t-16t
+		case(0xD2): OP_jp(!registers.getFlag(CARRY));			break;	// JP NC, u16			3b	12t-16t
 		//case(0xD3):	break;
-		case(0xD4): OP_call(!registers.getFlag(FLAGS::CARRY));			break;	// CALL NC, u16			3b	12t-24t
+		case(0xD4): OP_call(!registers.getFlag(CARRY));			break;	// CALL NC, u16			3b	12t-24t
 		case(0xD5): OP_push(registers.getDE());							break;	// PUSH DE				1b	16t
 		case(0xD6): OP_sub(read8());									break;	// SUB A, u8			2b	8t
 		case(0xD7): OP_rst(0x10);										break;	// RST 10h				1b	16t
-		case(0xD8): OP_ret(registers.getFlag(FLAGS::CARRY));			break;	// RET C				1b	8t-20t
+		case(0xD8): OP_ret(registers.getFlag(CARRY));			break;	// RET C				1b	8t-20t
 		case(0xD9): OP_reti();											break;	// RETI					1b	16t
-		case(0xDA):	OP_jp(registers.getFlag(FLAGS::CARRY));				break;	// JP C, u16			3b	12t-16t
+		case(0xDA):	OP_jp(registers.getFlag(CARRY));				break;	// JP C, u16			3b	12t-16t
 		//case(0xDB):	break;
-		case(0xDC):	OP_call(registers.getFlag(FLAGS::CARRY));			break;	// CALL C, u16			3b	12t-24t
+		case(0xDC):	OP_call(registers.getFlag(CARRY));			break;	// CALL C, u16			3b	12t-24t
 		//case(0xDD):	break;
 		case(0xDE):	OP_sbc(read8());									break;	// SBC A, u8			2b	8t
 		case(0xDF):	OP_rst(0x18);										break;	// RST 18h				1b	16t
@@ -517,7 +525,7 @@ void Cpu::executeInstruction() {
 		case(0xE5):	OP_push(registers.getHL());							break;	// PUSH HL				1b	16t
 		case(0xE6):	OP_and(read8());									break;	// AND A, u8			2b	8t
 		case(0xE7):	OP_rst(0x20);										break;	// RST 20h				1b	16t
-		case(0xE8):	sp = OP_add16(sp, read8());							break;	// ADD SP, i8			2b	16t
+		case(0xE8):	sp = OP_add16(sp, read8(), true);					break;	// ADD SP, e8			2b	16t
 		case(0xE9):	pc = registers.getHL();								break;	// JP HL				1b	4t
 		case(0xEA): write(read16(), registers.a);						break;	// LD (u16), A			3b	16t
 		//case(0xEB):	break;
@@ -526,14 +534,14 @@ void Cpu::executeInstruction() {
 		case(0xEE): OP_xor(read8());									break;	// XOR A, u8				2b	8t
 		case(0xEF): OP_rst(0x28);										break;	// RST 28h				1b	16t
 		case(0xF0):	registers.a = read(0xFF00 + read8());				break;	// LD A, (FF00+u8)		2b	12t
-		case(0xF1):	registers.setAF(OP_pop());							break;	// POP AF				1b	12t
+		case(0xF1):	registers.setAF(OP_pop() & 0xFFF0);					break;	// POP AF				1b	12t
 		case(0xF2):	registers.a = read(0xFF00 + registers.c);			break;	// LD A, (FF00+C)		1b	8t
 		case(0xF3): OP_di();											break;	// DI					1b	4t
 		//case(0xF4):	break;
 		case(0xF5):	OP_push(registers.getAF());							break;	// PUSH AF				1b	16t
 		case(0xF6):	OP_or(read8());										break;	// OR A, u8				2b	8t
 		case(0xF7):	OP_rst(0x30);										break;	// RST 30h				1b	16t
-		case(0xF8):	OP_ld16(read8());									break;	// LD HL, SP+i8			2b	12t
+		case(0xF8):	OP_ld16(read8());									break;	// LD HL, SP+e8			2b	12t
 		case(0xF9): sp = registers.getHL();								break;	// LD SP, HL			1b	8t
 		case(0xFA): registers.a = read(read16());						break;	// LD A, (u16)			3b	16t
 		case(0xFB):	OP_ei();											break;	// EI					1b	4t
@@ -541,16 +549,16 @@ void Cpu::executeInstruction() {
 		//case(0xFD):	break;
 		case(0xFE):	OP_cp(read8());										break;	// CP A, u8				2b	8t
 		case(0xFF):	OP_rst(0x38);										break;	// RST 38h				1b	16t
-		default: OP_nop();												break;	// NOP						1b	4t
+		default: OP_nop();												break;	// NOP					1b	4t
 	}
 }
 
 uint8_t Cpu::read(uint16_t address) {
-	return memoryController->read(address);
+	return memoryController->cpuRead(address);
 }
 
 void Cpu::write(uint16_t address, uint8_t value) {
-	memoryController->write(address, value);
+	memoryController->cpuWrite(address, value);
 }
 
 uint8_t Cpu::read8() {
