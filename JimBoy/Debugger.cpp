@@ -137,8 +137,8 @@ void Debugger::RenderWindows(unsigned cycles) {
 	ImGui::SetNextWindowSize({500, 220});
 	CreatePpuWindow();
 
-	ImGui::SetNextWindowPos({1100, 50});
-	CreateMemoryWindow();
+	//ImGui::SetNextWindowPos({1100, 50});
+	//CreateMemoryWindow();
 
 	ImGui::Render();
 	ImGuiSDL::Render(ImGui::GetDrawData());

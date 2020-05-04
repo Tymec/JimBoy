@@ -18,7 +18,7 @@ instructions = [
     "OR A, B", "OR A, C", "OR A, D", "OR A, E", "OR A, H", "OR A, L", "OR A,(HL)", "OR A, A", "CP A, B", "CP A, C", "CP A, D", "CP A, E", "CP A, H", "CP A, L", "CP A, (HL)", "CP A, A",
 
     "RET NZ", "POP BC", "JP NZ, u16", "JP u16", "CALL NZ, u16", "PUSH BC", "ADD A, u8", "RST 00h", "RET Z", "RET", "JP Z, u16", "PREFIX 0xCB", "CALL Z, u16", "CALL u16", "ADC A, u8", "RST 08h",
-    "RET NC", "POP DE", "JP NC, u16", "INVALID", "CALL NC, u16", "PUSH DE", "SUB A, u8", "RST 10h", "RET C", "RETI", "JP C, u16", "INVALID", "CALL C, u16", "INVALID", "SBC A, u8", "RST 18h",
+    "RET NC", "POP DE", "JP NC, u16", "INVALID", "CALL NC, u16", "PUSH DE", "SUB A, u8", "RST 10h", "RET C", "RETI", "JP C, u16", "DB x", "CALL C, u16", "INVALID", "SBC A, u8", "RST 18h",
     "LD (FF00+u8), A", "POP HL", "LD (FF00+C), A", "INVALID", "INVALID", "PUSH HL", "AND A, u8", "RST 20h", "ADD SP, e8", "JP HL", "LD (u16), A", "INVALID", "INVALID", "INVALID", "XOR A,u8", "RST 28h",
     "LD A, (FF00+u8)", "POP AF", "LD A, (FF00+C)", "DI", "INVALID", "PUSH AF", "OR A, u8", "RST 30h", "LD HL, SP+e8", "LD SP, HL", "LD A, (u16)", "EI", "INVALID", "INVALID", "CP A, u8", "RST 38h"
 ]
@@ -60,184 +60,223 @@ byte_length = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
     1, 1, 3, 3, 3, 1, 2, 1, 1, 1, 3, 1, 3, 3, 2, 1,
-    1, 1, 3, 0, 3, 1, 2, 1, 1, 1, 3, 0, 3, 0, 2, 1,
-    2, 1, 1, 0, 0, 1, 2, 1, 2, 1, 3, 0, 0, 0, 2, 1,
-    2, 1, 1, 1, 0, 1, 2, 1, 2, 1, 3, 1, 0, 0, 2, 1
+    1, 1, 3, 1, 3, 1, 2, 1, 1, 1, 3, 1, 3, 1, 2, 1,
+    2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 3, 1, 1, 1, 2, 1,
+    2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 3, 1, 1, 1, 2, 1
 ]
 prefix_byte_length = 2
 illegal_opcodes = bytes([0xD3, 0xE3, 0xE4, 0xF4, 0xDB, 0xEB, 0xEC, 0xFC, 0xDD, 0xED, 0xFD])
 
-"""NOT IN USE FOR NOW
-prefix_cycles = [
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-
-    "2", "2", "2", "2", "2", "2", "3", "2", "2", "2", "2", "2", "2", "2", "3", "2",
-    "2", "2", "2", "2", "2", "2", "3", "2", "2", "2", "2", "2", "2", "2", "3", "2",
-    "2", "2", "2", "2", "2", "2", "3", "2", "2", "2", "2", "2", "2", "2", "3", "2",
-    "2", "2", "2", "2", "2", "2", "3", "2", "2", "2", "2", "2", "2", "2", "3", "2",
-
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2",
-    "2", "2", "2", "2", "2", "2", "4", "2", "2", "2", "2", "2", "2", "2", "4", "2"
-]
-cycles = [
-    "1",    "3", "2",   "2", "1",   "1", "2", "1", "5",     "2", "2",   "2", "1",   "1", "2", "1",
-    "1",    "3", "2",   "2", "1",   "1", "2", "1", "3",     "2", "2",   "2", "1",   "1", "2", "1", 
-    "2-3",  "3", "2",   "2", "1",   "1", "2", "1", "2-3",   "2", "2",   "2", "1",   "1", "2", "1",
-    "2-3",  "3", "2",   "2", "3",   "3", "3", "1", "2-3",   "2", "2",   "2", "1",   "1", "2", "1",
-
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "2",    "2", "2",   "2", "2",   "2", "1", "2", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-    "1",    "1", "1",   "1", "1",   "1", "2", "1", "1",     "1", "1",   "1", "1",   "1", "2", "1",
-
-    "2-5",  "3", "3-4", "4", "3-6", "4", "2", "4", "2-5",   "4", "3-4", "0", "3-6", "6", "2", "4",
-    "2-5",  "3", "3-4", "0", "3-6", "4", "2", "4", "2-5",   "4", "3-4", "0", "3-6", "0", "2", "4",
-    "3",    "3", "2",   "0", "0",   "4", "2", "4", "4",     "2", "4",   "0", "0",   "0", "2", "4",
-    "3",    "3", "2",   "1", "0",   "4", "2", "4", "3",     "2", "4",   "1", "0",   "0", "2", "4"
-]
-"""
-
 allowed_extensions = ['.gb']
+
+def byte_to_sbyte(byte_hex_str):
+    unsigned = ord(bytearray.fromhex(byte_hex_str))
+    sbyte = unsigned - 256 if unsigned > 127 else unsigned
+    return sbyte
+
+
+class Instruction:
+    def __init__(self, address, opcode, comment="", prefix=False):
+        self.address = address
+        self.opcode = opcode
+        self.args = []
+        self.comment = comment
+        
+        self.mnemonic = self.get_instruction(prefix)
+        self.length = self.get_length(prefix)
+    
+    def get_length(self, prefix):
+        if prefix:
+            return prefix_byte_length
+        return byte_length[self.opcode]
+    
+    def get_instruction(self, prefix):
+        if prefix:
+            return prefix_instructions[self.opcode]
+        return instructions[self.opcode]
+    
+    def replace_byte(self):
+        if self.opcode == 0xDB:
+            new_instr = self.mnemonic.replace('x', ''.join(self.args))
+        elif 'u8' in self.mnemonic:
+            new_instr = self.mnemonic.replace('u8', self.args[0])
+        elif 'u16' in self.mnemonic:
+            new_instr = self.mnemonic.replace('u16', ''.join(self.args[::-1]))
+        elif 'e8' in self.mnemonic:
+            new_instr = self.mnemonic.replace('e8', str(self.args[0][2:].upper()))
+        else:
+            new_instr = self.mnemonic
+        return new_instr
+
 
 class Dissasembler:
     def __init__(self):
         self.i = 0
-        self.prefix = False
         self.header = []
-    
-    def translate(self, opcode):
-        if opcode in illegal_opcodes:
-            self.i += 1
-            return "INVALID", 0
-    
-        if self.prefix:
-            self.i += prefix_byte_length
-            self.prefix = False
-            return prefix_instructions[opcode], prefix_byte_length
-        self.i += byte_length[opcode]
-        return instructions[opcode], byte_length[opcode]
-    
-    @staticmethod
-    def byte_to_sbyte(byte_hex_str):
-        unsigned = ord(bytearray.fromhex(byte_hex_str))
-        sbyte = unsigned - 256 if unsigned > 127 else unsigned
-        return sbyte
-    
-    def handle_args(self, instr, args):
-        if 'u8' in instr:
-            new_instr = instr.replace('u8', args[0])
-        elif 'u16' in instr:
-            new_instr = instr.replace('u16', ''.join(args[::-1]))
-        elif 'e8' in instr:
-            new_instr = instr.replace('e8', str(args[0][2:].upper()))
-        else:
-            new_instr = instr
-        return new_instr
         
     def handle_header(self, header_buffer):
         new_header_buffer = []
+        HEADER_START_ADDRESS = 0x104
+        current_pos = 0
+
         # Nintendo Logo (0x104 - 0x133)
-        offset = (0x133 - 0x104) + 1
-        logo = {'addr': self.buffer_header_start, 'instr': '', 'args':[], 'comment': ""}
-        for i in range(0, offset):
-            logo['instr'] += header_buffer[i]['opcode']
+        logo_size = (0x133 - 0x104) + 1
+        logo = Instruction(HEADER_START_ADDRESS, 0xDB)
+        for i in range(0, logo_size):
+            logo.args.append(hex(header_buffer[i].opcode)[2::])
+        logo.comment = "Nintendo Logo"
         new_header_buffer.append(logo)
+        current_pos += logo_size
+
         # Title (0x134 - 0x0143)
-        offset = (0x143 - 0x134) + 1
-        title = {'addr': self.buffer_header_start + title_offset, 'instr': '', 'args':[], 'comment': ""}
-        for i in range(0, title_offset):
-            if  header_buffer[i + offset]['opcode'] == '00':
+        title_size = (0x143 - 0x134) + 1
+        title = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        for i in range(0, title_size):
+            char_hex = hex(header_buffer[i + current_pos].opcode)[2::]
+            if char_hex == '0':
                 continue
-            title['instr'] += header_buffer[i + offset]['opcode']
-        title['instr'] = bytes.fromhex(title['instr']).decode("ASCII")
+            title.args.append(char_hex)
+        title.args = bytes.fromhex(''.join(title.args)).decode("ASCII")
+        title.comment = "Title"
         new_header_buffer.append(title)
+        current_pos += title_size
+        
         # New Licensee Code (0x0144 - 0x0145)
-        ne
+        new_licensee_code_size = (0x145 - 0x144) + 1
+        new_licensee_code = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        for i in range(0, new_licensee_code_size):
+            new_licensee_code.args.append(hex(header_buffer[i + current_pos].opcode)[2::])
+        new_licensee_code.comment = "New Licensee Code"
+        new_header_buffer.append(new_licensee_code)
+        current_pos += new_licensee_code_size
+        
         # SGB Flag (0x0146)
+        sgb_flag = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        sgb_flag.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        sgb_flag.comment = "SGB Flag"
+        new_header_buffer.append(sgb_flag)
+        current_pos += 1
+        
         # Cartridge Type (0x147)
+        cartridge_type = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        cartridge_type.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        cartridge_type.comment = "Cartridge Type"
+        new_header_buffer.append(cartridge_type)
+        current_pos += 1
+        
         # ROM Size (0x148)
+        rom_size = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        rom_size.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        rom_size.comment = "ROM Size"
+        new_header_buffer.append(rom_size)
+        current_pos += 1
+        
         # RAM Size (0x149)
+        ram_size = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        ram_size.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        ram_size.comment = "RAM Size"
+        new_header_buffer.append(ram_size)
+        current_pos += 1
+        
         # Destination Code (0x14A)
+        destination_code = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        destination_code.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        destination_code.comment = "Destination Code"
+        new_header_buffer.append(destination_code)
+        current_pos += 1
+        
         # Old Licensee Code (0x14B)
-        # Mask ROM Version number (0x14C)
+        old_licensee_code = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        old_licensee_code.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        old_licensee_code.comment = "Old Licensee Code" 
+        new_header_buffer.append(old_licensee_code)
+        current_pos += 1
+        
+        # Mask ROM Version Number (0x14C)
+        mask_rom_version_number = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        mask_rom_version_number.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        mask_rom_version_number.comment = "Mask ROM Version Number"
+        new_header_buffer.append(mask_rom_version_number)
+        current_pos += 1
+        
         # Header Checksum (0x14D)
+        header_checksum = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        header_checksum.args.append(hex(header_buffer[current_pos].opcode)[2::])
+        header_checksum.comment = "Header Checksum"
+        new_header_buffer.append(header_checksum)
+        current_pos += 1
+        
         # Global Checksum (0x14E - 0x14F)
+        global_checksum_size = (0x14F - 0x14E) + 1
+        global_checksum = Instruction(HEADER_START_ADDRESS + current_pos, 0xDB)
+        for i in range(0, global_checksum_size):
+            global_checksum.args.append(hex(header_buffer[i + current_pos].opcode)[2::])
+        global_checksum.comment = "Global Checksum"
+        new_header_buffer.append(global_checksum)
+        current_pos += global_checksum_size
+        
         
         return new_header_buffer
     
     def disassemble(self, file_path, output_file):
         buffer = []
+        
         with open(file_path, "rb") as f:
+            prefix = False
+            
             for i in range(0, os.path.getsize(file_path)):
+                # Read next byte
                 byte = f.read(1)
+                
+                # Opcodes
                 opcode_hex = byte.hex()
                 opcode = int.from_bytes(byte, byteorder='big', signed=False)
                 
+                # Skip if current byte belongs to last instruction's args
                 if not i == self.i:
-                    if all(x in buffer[-1]['instr'] for x in ['JR', 'e8']):
-                        e8 = self.byte_to_sbyte(opcode_hex)
-                        buffer[-1]['args'].append(hex((buffer[-1]['addr'] + 2) + e8))
+                    # Set signed offset for JR instructions
+                    if all(x in buffer[-1].mnemonic for x in ['JR', 'e8']):
+                        e8 = byte_to_sbyte(opcode_hex)
+                        buffer[-1].args.append(hex((buffer[-1].address + 2) + e8))
                         continue
-                    
-                    buffer[-1]['args'].append(opcode_hex)
+                        
+                    # Add arg to instruction's args array
+                    buffer[-1].args.append(opcode_hex)
                     continue
                 
-                if 0x14E >= self.i >= 0x104:
+                if 0x14F >= self.i >= 0x104:
                     if self.i == 0x104:
                         self.buffer_header_start = len(buffer)
-                    elif self.i == 0x14E:
+                    elif self.i == 0x14F:
                         self.buffer_header_stop = len(buffer)
-                    buffer.append({
-                        'addr': i,
-                        'opcode': opcode_hex,
-                        'instr': "HEADER",
-                        'bytes': 1,
-                        'args': []
-                    })
+                        
+                    instr = Instruction(self.i, opcode)
+                    buffer.append(instr)
                     self.i += 1
                     continue
-            
+                
                 if opcode == 0xCB:
-                    self.prefix = True
+                    prefix = True
                     self.i += 1
                     continue
                     
-                _instr, _len = self.translate(opcode)
-                buffer.append({
-                    'addr': i,
-                    'opcode': opcode_hex,
-                    'instr': _instr,
-                    'bytes': _len,
-                    'args': [],
-                    'comment': ""
-                })
-        
+                instr = Instruction(i, opcode, prefix=prefix)
+                self.i += instr.length
+                buffer.append(instr)
+                
+                prefix = False
         
         header_buffer = self.handle_header(buffer[self.buffer_header_start:self.buffer_header_stop + 1])
         buffer[self.buffer_header_start:self.buffer_header_stop + 1] = header_buffer
         
         with open(output_file, "w") as f:
             for e in buffer:
-                if len(e['args']) > 0:
-                    e['instr'] = self.handle_args(e['instr'], e['args'])
+                if len(e.args) > 0:
+                    e.mnemonic = e.replace_byte()
                 
-                f.write(f"0x{hex(e['addr'])[2:].upper()}: {e['instr']}\n")
+                f.write(f"0x{hex(e.address)[2:].upper()}: {e.mnemonic}{f' | {e.comment}' if e.comment != '' else ''}\n")
         return
+
 
 if __name__ == "__main__":
     fire.Fire(Dissasembler().disassemble)
