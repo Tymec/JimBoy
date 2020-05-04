@@ -1,20 +1,19 @@
 <img align="right" width="200" src="./Assets/logo.png"></img>
-## JimBoy
-### A GameBoy Emulator
-A project that I'm working on in my spare time as a hobby project
+JimBoy
+=============
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/Tymec/JimBoy?svg=true&branch=master)](https://ci.appveyor.com/project/Tymec/jimboy)
+[![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Tymec/JimBoy/master)](https://github.com/Tymec/JimBoy/commit/)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c60e209df7174d0bac9e845d298a5e9c)](https://www.codacy.com/manual/Tymec/JimBoy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Tymec/JimBoy&amp;utm_campaign=Badge_Grade)
+[![GitHub](https://img.shields.io/github/license/Tymec/JimBoy)](LICENSE)
+[![HitCount](http://hits.dwyl.com/Tymec/JimBoy.svg)](http://hits.dwyl.com/Tymec/JimBoy)
 
----
-#### References:
-- ##### Documentation:
-  - [Pandocs](https://gbdev.io/pandocs)
-  - [More pandocs](http://bgb.bircd.org/pandocs.htm)
-  - [GCISheet](http://www.devrs.com/gb/files/GBCPU_Instr.html)
-  - [GBZ80](https://rednex.github.io/rgbds/gbz80.7.html)
-  - [gbops](https://izik1.github.io/gbops/index.html)
-  - [awesome-gbdev](https://github.com/gbdev/awesome-gbdev)
-  - [gbctr.pdf](https://gekkio.fi/files/gb-docs/gbctr.pdf)
-- ##### Code (in case I'm stuck):
-  - [ProjectDMG](https://github.com/BluestormDNA/ProjectDMG)
-  - [PyBoy](https://github.com/Baekalfen/PyBoy)
-  - [NicoGB](https://github.com/nicoeps/NicoGB)
-  - [destoer-emu](https://github.com/destoer/destoer-emu)
+[![forthebadge](https://forthebadge.com/images/badges/uses-badges.svg)](https://forthebadge.com)
+### A GameBoy Emulator
+A project that I'm working on in my spare time as a hobby project.
+The Emulator is written in C++ and uses SDL2, using the [Pan Docs](https://gbdev.io/pandocs/) for reference.
+
+## Dependencies
+  - [SDL2](https://www.libsdl.org/)
+  - [imgui](https://github.com/ocornut/imgui)
+  - [imgui_sdl](https://github.com/Tyyppi77/imgui_sdl)
+  - [imgui_club](https://github.com/ocornut/imgui_club)
