@@ -32,5 +32,3 @@ after_build:
   - ps: 7z a JimBoy-$env:APPVEYOR_BUILD_VERSION-$env:configuration-win_$env:platform.zip .\$env:platform\$env:configuration\
 artifacts:
   - path: JimBoy-%APPVEYOR_BUILD_VERSION%-$(configuration)-win_$(platform).zip
-  #- path: .\$(platform)\$(configuration)\
-  #  name: JimBoy-%APPVEYOR_BUILD_VERSION%-$(configuration)-win_$(platform)
