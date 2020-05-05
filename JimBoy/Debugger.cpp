@@ -5,10 +5,9 @@
 unsigned WIDTH	= 1000;
 unsigned HEIGHT = 1000;
 
-Debugger::Debugger(Cpu* cpu, Ppu* ppu, Interrupts* interrupts, MemoryController* memoryController) {
+Debugger::Debugger(Cpu* cpu, Ppu* ppu, MemoryController* memoryController) {
 	this->cpu = cpu;
 	this->ppu = ppu;
-	this->interrupts = interrupts;
 	this->memoryController = memoryController;
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -48,7 +47,8 @@ void Debugger::Update(unsigned cycles) {
 			Idle(cycles);
 		}
 
-		//RenderWindows(cycles);
+		if (animate)
+			RenderWindows(cycles);
 	}
 }
 
@@ -159,6 +159,8 @@ void Debugger::CreateCpuWindow(unsigned cycles) {
 	if (ImGui::Button("Step")) {
 		mode = STEP;
 	}
+	ImGui::SameLine();
+	ImGui::Checkbox("Animate", &animate);
 	
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Breakpoint");
@@ -274,20 +276,20 @@ void Debugger::CreateCpuWindow(unsigned cycles) {
 	ImGui::Text("Interrupts Enable:");
 	ImGui::Separator();
 	ImGui::Columns(5, "interrupts_ie");
-	ImGui::Text("V-Blank:");
-	ImGui::Text("%d", interrupts->getIeRegister(VBLANK));
+	ImGui::Text("V-Blank:"); 
+	ImGui::Text("%d", cpu->interrupts.getIe(VBLANK));
 	ImGui::NextColumn();
 	ImGui::Text("LCD:");
-	ImGui::Text("%d", interrupts->getIeRegister(LCD));
+	ImGui::Text("%d", cpu->interrupts.getIe(LCD));
 	ImGui::NextColumn();
 	ImGui::Text("Timer:");
-	ImGui::Text("%d", interrupts->getIeRegister(TIMER));
+	ImGui::Text("%d", cpu->interrupts.getIe(TIMER));
 	ImGui::NextColumn();
 	ImGui::Text("Serial:");
-	ImGui::Text("%d", interrupts->getIeRegister(SERIAL));
+	ImGui::Text("%d", cpu->interrupts.getIe(SERIAL));
 	ImGui::NextColumn();
 	ImGui::Text("Joypad:");
-	ImGui::Text("%d", interrupts->getIeRegister(JOYPAD));
+	ImGui::Text("%d", cpu->interrupts.getIe(JOYPAD));
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 	ImGui::Separator();
@@ -296,19 +298,19 @@ void Debugger::CreateCpuWindow(unsigned cycles) {
 	ImGui::Separator();
 	ImGui::Columns(5, "interrupts_if");
 	ImGui::Text("V-Blank:");
-	ImGui::Text("%d", interrupts->getIfRegister(VBLANK));
+	ImGui::Text("%d", cpu->interrupts.getIf(VBLANK));
 	ImGui::NextColumn();
 	ImGui::Text("LCD:");
-	ImGui::Text("%d", interrupts->getIfRegister(LCD));
+	ImGui::Text("%d", cpu->interrupts.getIf(LCD));
 	ImGui::NextColumn();
 	ImGui::Text("Timer:");
-	ImGui::Text("%d", interrupts->getIfRegister(TIMER));
+	ImGui::Text("%d", cpu->interrupts.getIf(TIMER));
 	ImGui::NextColumn();
 	ImGui::Text("Serial:");
-	ImGui::Text("%d", interrupts->getIfRegister(SERIAL));
+	ImGui::Text("%d", cpu->interrupts.getIf(SERIAL));
 	ImGui::NextColumn();
 	ImGui::Text("Joypad:");
-	ImGui::Text("%d", interrupts->getIfRegister(JOYPAD));
+	ImGui::Text("%d", cpu->interrupts.getIf(JOYPAD));
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 	ImGui::Separator();
@@ -387,13 +389,12 @@ void Debugger::CreateCartridgeWindow() {
 	ImGui::Text("Title: %s", cartInfo->title);
 	ImGui::Text("Supports SGB:");
 	ImGui::SameLine();
-	bool sgbFlag = cartInfo->sgbFlag != 0;
-	ImGui::Text(sgbFlag ? "True" : "False");
+	ImGui::Text(cartInfo->sgbFlag ? "True" : "False");
 	ImGui::Text("Version Number: %d", cartInfo->versionNumber);
 	ImGui::Text("Destination Code:");
 	ImGui::SameLine();
 	ImGui::Text(cartInfo->destinationCode == 1 ? "Non-Japanese" : "Japanese");
-	if (sgbFlag) {
+	if (cartInfo->sgbFlag) {
 		ImGui::Text("Licensee Code: %s", cartridgeNewLicencee.at((int)cartInfo->newLicenseeCode).c_str());
 	} else {
 		ImGui::Text("Licensee Code: %s", cartridgeOldLicencee.at(cartInfo->oldLicenseeCode).c_str());
@@ -431,7 +432,7 @@ void Debugger::CreateCartridgeWindow() {
 void Debugger::CreateMemoryWindow() {
 	static MemoryEditor mem_edit;
 	ImGui::Begin("Memory");
-	mem_edit.DrawContents(memoryController->cartridge->rom, 0x8000, 0x0);
+	//mem_edit.DrawContents(memoryController->cartridge->rom, 0x8000, 0x0);
 	ImGui::End();
 }
 

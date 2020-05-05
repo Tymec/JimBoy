@@ -9,7 +9,7 @@ class Display {
 public:
 	Display();
 	~Display();
-	void render(void const* buffer);
+	void Render(void const* buffer, int pitch);
 
 	bool isInitialized();
 private:

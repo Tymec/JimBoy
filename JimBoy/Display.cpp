@@ -28,7 +28,11 @@ Display::~Display() {
 	SDL_Quit();
 }
 
-void Display::render(void const* buffer) {
+void Display::Render(void const* buffer, int pitch) {
+	SDL_UpdateTexture(texture, nullptr, buffer, pitch);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+	SDL_RenderPresent(renderer);
 }
 
 bool Display::isInitialized() {

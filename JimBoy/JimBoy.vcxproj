@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cartridge.cpp" />
     <ClCompile Include="Debugger.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -158,8 +159,8 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Interrupts.cpp" />
     <ClCompile Include="JimBoy.cpp" />
+    <ClCompile Include="Mbc.cpp" />
     <ClCompile Include="MemoryController.cpp" />
-    <ClCompile Include="Cartridge.cpp" />
     <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="main.cpp" />
@@ -169,13 +170,14 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cartridge.h" />
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="JimBoy.h" />
+    <ClInclude Include="Mbc.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Interrupts.h" />
     <ClInclude Include="MemoryController.h" />
-    <ClInclude Include="Cartridge.h" />
     <ClInclude Include="Cpu.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Memory.h" />

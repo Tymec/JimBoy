@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include "Interrupts.h"
 
 const uint8_t ZERO_FLAG_POSITION = 0x80;
 const uint8_t SUB_FLAG_POSITION = 0x40;
@@ -97,6 +98,7 @@ public:
 private:
 	friend class Debugger; // NOT SMART!!!
 	MemoryController *memoryController; // Pointer to MemoryController
+	Interrupts interrupts;
 
 	bool branch{}; // If jump is branching
 	uint16_t prevPc{}; // PC when cycle began

@@ -1,6 +1,6 @@
 #include "JimBoy.h"
 
-JimBoy::JimBoy() : memoryController(), cpu(&memoryController), interrupts(&memoryController), ppu(&memoryController), debugger(&cpu, &ppu, &interrupts, &memoryController) {
+JimBoy::JimBoy() : memoryController(), cpu(&memoryController), ppu(&memoryController), display(), debugger(&cpu, &ppu, &memoryController) {
 }
 
 JimBoy::~JimBoy() {
@@ -8,6 +8,10 @@ JimBoy::~JimBoy() {
 
 void JimBoy::Start(char const* rom_path) {
 	memoryController.InsertCartridge(rom_path);
+	if (!memoryController.isCartridgeLoaded()) {
+		std::cout << "Failed to load cartridge" << std::endl;
+		return;
+	}
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> current, previous;
 	previous = std::chrono::high_resolution_clock::now();
@@ -19,6 +23,9 @@ void JimBoy::Start(char const* rom_path) {
 		unsigned cycles = 0;
 		while (cycles < MAX_CYCLES && !quit) {
 			cycles += cpu.Cycle();
+
+			ppu.Update(cycles);
+			display.Render(ppu.framebuffer, 10);
 
 			debugger.Update(cycles);
 			if (debugger.quit)

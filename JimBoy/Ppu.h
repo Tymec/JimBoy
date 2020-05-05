@@ -1,6 +1,13 @@
 #pragma once
 #include <iostream>
 
+enum lcdMode {
+	H_BLANK,
+	V_BLANK,
+	OAM_SEARCH,
+	TRANSFER
+};
+
 enum ppuRegister {
 	LCDC = 0xFF40,	// LCD Control
 	STAT = 0xFF41,	// LCDC Status
@@ -23,10 +30,12 @@ public:
 	~Ppu();
 	
 	uint32_t framebuffer[160 * 144]{};
+	void Update(unsigned cycles);
 	uint8_t getRegister(ppuRegister reg);
 private:
 	uint8_t read(uint16_t address);
 	void write(uint16_t address, uint8_t value);
+	lcdMode Mode = OAM_SEARCH;
 
 	MemoryController *memoryController; // Pointer to MemoryController
 };

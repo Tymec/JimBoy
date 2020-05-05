@@ -2,8 +2,7 @@
 #include "MemoryController.h"
 #include "Types.h"
 
-Cpu::Cpu(MemoryController *memoryController) {
-	this->memoryController = memoryController;
+Cpu::Cpu(MemoryController *memoryController) : memoryController(memoryController), interrupts(memoryController) {
 }
 
 Cpu::~Cpu() {
@@ -12,6 +11,15 @@ Cpu::~Cpu() {
 unsigned Cpu::Cycle() {
 	prefix = false;
 	branch = false;
+
+	if (ime) {
+		uint8_t interrupt =  interrupts.handleInterrupts();
+		if (interrupt != 0x0) {
+			halted = false;
+			OP_rst(interrupt);
+			ime = false;
+		}
+	}
 
 	if (!halted) {
 		prevPc = pc;
@@ -28,7 +36,7 @@ unsigned Cpu::Cycle() {
 		//std::cout << getInstruction(opcode, prefix).c_str() << std::endl;
 		return getCycle(opcode, prefix, branch);
 	}
-	return 4;
+	return 1;
 }
 
 void Cpu::ExecuteInstruction() {

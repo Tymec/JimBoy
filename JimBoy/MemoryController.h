@@ -21,6 +21,7 @@ public:
 
 	void insertBootrom(uint8_t* bootrom);
 	bool isBootromEnabled();
+	bool isCartridgeLoaded();
 private:
 	friend class Debugger; // NOT SMART!!!
 	Memory memory; // Memory

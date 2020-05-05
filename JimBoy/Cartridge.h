@@ -1,14 +1,12 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-
-const uint16_t ROM_BANK_SIZE = 32768; // Size of ROM Bank
-const uint16_t EXTERNAL_RAM_SIZE = 8192; // Size of External RAM
-const uint16_t ROM_BANK_1_OFFSET = 0x4000; // Offset for ROM Bank 1
+#include "Mbc.h"
 
 struct CartridgeInfo {
+	//std::string title;
 	char title[16];
-	long fileSize;
+	size_t fileSize;
 	uint8_t romType;
 	uint8_t romSize;
 	uint8_t ramSize;
@@ -16,7 +14,7 @@ struct CartridgeInfo {
 	uint8_t oldLicenseeCode;
 	uint8_t destinationCode;
 	uint8_t versionNumber;
-	uint8_t sgbFlag;
+	bool sgbFlag;
 	uint8_t checksum;
 	uint8_t calculatedChecksum;
 	uint16_t globalChecksum;
@@ -49,12 +47,14 @@ public:
 	Cartridge(MemoryController *memoryController, char const* filePath);
 	~Cartridge();
 
-	// Read & write from/to ROM Bank 0
+	// Read & write from/to ROM Bank 00~N
 	uint8_t readRom(uint16_t address);
 	void writeRom(uint16_t address, uint8_t value);
 	// Read & write from/to External RAM
 	uint8_t readERam(uint16_t address);
 	void writeERam(uint16_t address, uint8_t value);
+
+	bool isLoaded();
 
 	CartridgeInfo cartInfo{}; // CartridgeInfo
 private:
@@ -65,8 +65,7 @@ private:
 
 	friend class Debugger; // NOT SMART!!!
 	MemoryController *memoryController; // Pointer to Bus
-
-	uint8_t rom[0x8000]{}; // 32KB ROM Bank
-	uint8_t eram[EXTERNAL_RAM_SIZE]{}; // 8KB External RAM
+	std::unique_ptr<MBC> mbc;
+	bool loaded = false;
 };
 

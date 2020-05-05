@@ -3,6 +3,7 @@
 #include "MemoryController.h"
 #include "Cpu.h"
 #include "Ppu.h"
+#include "Display.h"
 #include "Interrupts.h"
 #include "Debugger.h"
 
@@ -18,7 +19,7 @@ private:
 	MemoryController memoryController;
 	Cpu cpu;
 	Ppu ppu;
-	Interrupts interrupts;
+	Display display;
 	Debugger debugger;
 	uint8_t bootrom[0x100]{};
 	unsigned MAX_CYCLES = 70021;

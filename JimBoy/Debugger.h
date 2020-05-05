@@ -281,7 +281,7 @@ enum DebuggerMode {
 
 class Debugger {
 public:
-	Debugger(Cpu* cpu, Ppu* ppu, Interrupts* interrupts, MemoryController* memoryController);
+	Debugger(Cpu* cpu, Ppu* ppu, MemoryController* memoryController);
     ~Debugger();
 
     void Update(unsigned cycles);
@@ -291,11 +291,11 @@ private:
     Cpu* cpu;
     Ppu* ppu;
     MemoryController* memoryController;
-    Interrupts* interrupts;
 
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     DebuggerMode mode = IDLE;
+    bool animate = true;
 
     std::vector<uint16_t> breakpoints{};
 
