@@ -28,7 +28,7 @@ void Cartridge::LoadRom(char const *filePath) {
 
 		// Fill ROM with buffer
 		uint8_t *rom = new uint8_t[cartInfo.fileSize];
-		for (uint16_t i = 0; i < cartInfo.fileSize; i++) {
+		for (size_t i = 0; i < cartInfo.fileSize; i++) {
 			rom[i] = buffer[i];
 		}
 
@@ -76,7 +76,6 @@ void Cartridge::LoadRom(char const *filePath) {
 			case 0xFF:	std::cout << "MBC Error: HuC1 has not been implemented yet" << std::endl;			break;	// HuC1+RAM+BATTERY
 			default:	mbc.reset(new NoMBC(rom, ram, cartInfo.fileSize, _ramSize));						break;	// NoMBC
 		}
-
 		// Clear the buffer
 		delete[] buffer;
 

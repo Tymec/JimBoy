@@ -24,3 +24,11 @@ inline bool halfCheck16(const uint16_t a, const uint16_t b, const uint16_t res) 
 inline bool halfCheck(const uint8_t a, const uint8_t b, const uint8_t res) {
     return ((a ^ b ^ res) & 0x10);
 }
+
+inline bool testBit(const uint8_t val, const uint8_t bit) {
+	return val & (1 << bit);
+}
+
+inline bool setBit(const uint8_t val, const uint8_t bit) {
+	return val | bit;
+}

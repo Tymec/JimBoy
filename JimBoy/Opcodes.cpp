@@ -132,7 +132,7 @@ uint16_t Cpu::OP_add16(uint16_t reg, uint16_t v, bool s) {
 		e = reg + (signed char)v;
 		registers.setFlag(ZERO, false);
 	} else {
-		uint16_t e = reg + v;
+		e = reg + v;
 	}
 	registers.setFlag(SUB, false);
 	registers.setFlag(HALF, halfCarryAdd16(reg, v));

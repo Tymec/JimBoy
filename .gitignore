@@ -60,6 +60,7 @@ Roms/
 *.pdf
 *.psd
 Utils/output
+ignore/
 
 JimBoy/RCa19716
 

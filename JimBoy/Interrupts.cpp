@@ -36,6 +36,12 @@ uint8_t Interrupts::handleInterrupts() {
 	return 0;
 }
 
+void Interrupts::requestInterrupt(InterruptTypes i) {
+	uint8_t reg = memoryController->cpuRead(0xFF0F);
+	reg |= i;
+	memoryController->cpuWrite(0xFF0F, reg);
+}
+
 bool Interrupts::testInterrupt(InterruptTypes i, uint8_t fired) {
 	bool handled = false;
 

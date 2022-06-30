@@ -2,7 +2,7 @@
 #include "MemoryController.h"
 #include "Types.h"
 
-Cpu::Cpu(MemoryController *memoryController) : memoryController(memoryController), interrupts(memoryController) {
+Cpu::Cpu(MemoryController *memoryController) : memoryController(memoryController) {
 }
 
 Cpu::~Cpu() {
@@ -12,8 +12,15 @@ unsigned Cpu::Cycle() {
 	prefix = false;
 	branch = false;
 
+	// Serial output
+	if (read(0xFF02) == 0x81) {
+		uint8_t c = read(0xFF01);
+		std::cout << (char)c;
+		write(0xFF02, 0x0);
+	}
+
 	if (ime) {
-		uint8_t interrupt =  interrupts.handleInterrupts();
+		uint8_t interrupt =  memoryController->handleInterrupts();
 		if (interrupt != 0x0) {
 			halted = false;
 			OP_rst(interrupt);

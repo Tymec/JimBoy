@@ -24,6 +24,7 @@ public:
 	~Interrupts();
 	
 	uint8_t handleInterrupts();
+	void requestInterrupt(InterruptTypes i);
 private:
 	MemoryController* memoryController;
 	friend class Debugger;	// VERY BAD!!!

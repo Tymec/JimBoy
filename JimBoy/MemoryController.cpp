@@ -1,6 +1,6 @@
 #include "MemoryController.h"
 
-MemoryController::MemoryController() : memory(this) {
+MemoryController::MemoryController() : interrupts(this), memory(this) {
 }
 
 MemoryController::~MemoryController() {
@@ -61,6 +61,10 @@ void MemoryController::cpuWrite(uint16_t address, uint8_t value) {
 	} else if (address <= 0xFEFF) {
 		return;
 	} else if (address <= 0xFF7F) {
+		if (address == 0xFF04) {
+			memory.writeIo(0xFF04, 0); 
+			return;
+		}
 		memory.writeIo(address & 0x7F, value);
 	} else if (address <= 0xFFFF) {
 		memory.writeHRam(address & 0x7F, value);
@@ -118,6 +122,40 @@ void MemoryController::ppuWrite(uint16_t address, uint8_t value) {
 	} else if (address <= 0xFFFF) {
 		memory.writeHRam(address & 0x7F, value);
 	}
+}
+
+void MemoryController::directWrite(uint16_t address, uint8_t value) {
+	if (address <= 0x3FFF) {
+		cartridge->writeRom(address, value);
+	} else if (address <= 0x7FFF) {
+		cartridge->writeRom(address, value);
+	} else if (address <= 0x9FFF) {
+		memory.writeVRam(address & 0x1FFF, value);
+	} else if (address <= 0xBFFF) {
+		cartridge->writeERam(address & 0x1FFF, value);
+	} else if (address <= 0xCFFF) {
+		memory.writeWRam(address & 0x1FFF, value); // Replace with WRam0
+	} else if (address <= 0xDFFF) {
+		memory.writeWRam(address & 0x1FFF, value); // Replace with WRam1
+	} else if (address <= 0xFDFF) {
+		memory.writeWRam(address & 0x1FFF, value); // Replace with Wram0 and Wram1
+	} else if (address <= 0xFE9F) {
+		memory.writeOam(address & 0x9F, value);
+	} else if (address <= 0xFEFF) {
+		return;
+	} else if (address <= 0xFF7F) {
+		memory.writeIo(address & 0x7F, value);
+	} else if (address <= 0xFFFF) {
+		memory.writeHRam(address & 0x7F, value);
+	}
+}
+
+void MemoryController::requestInterrupt(InterruptTypes i) {
+	interrupts.requestInterrupt(i);
+}
+
+uint8_t MemoryController::handleInterrupts() {
+	return interrupts.handleInterrupts();
 }
 
 void MemoryController::insertBootrom(uint8_t* bootrom) {

@@ -1,6 +1,6 @@
 #include "JimBoy.h"
 
-JimBoy::JimBoy() : memoryController(), cpu(&memoryController), ppu(&memoryController), display(), debugger(&cpu, &ppu, &memoryController) {
+JimBoy::JimBoy() : memoryController(), cpu(&memoryController), ppu(&memoryController), timer(&memoryController), display(), debugger(&cpu, &ppu, &memoryController) {
 }
 
 JimBoy::~JimBoy() {
@@ -23,7 +23,7 @@ void JimBoy::Start(char const* rom_path) {
 		unsigned cycles = 0;
 		while (cycles < MAX_CYCLES && !quit) {
 			cycles += cpu.Cycle();
-
+			timer.Update(cycles);
 			ppu.Update(cycles);
 			display.Render(ppu.framebuffer, 10);
 

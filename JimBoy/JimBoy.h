@@ -4,8 +4,9 @@
 #include "Cpu.h"
 #include "Ppu.h"
 #include "Display.h"
-#include "Interrupts.h"
+#include "Timer.h"
 #include "Debugger.h"
+#include "Types.h"
 
 class JimBoy {
 public:
@@ -19,9 +20,10 @@ private:
 	MemoryController memoryController;
 	Cpu cpu;
 	Ppu ppu;
+	Timer timer;
 	Display display;
 	Debugger debugger;
 	uint8_t bootrom[0x100]{};
-	unsigned MAX_CYCLES = 70021;
+	unsigned MAX_CYCLES = CLOCKSPEED / 60;
 };
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 
+#define CLOCKSPEED 4194304
+
 static const std::string Instructions[] = {
     "NOP", "LD BC, u16", "LD (BC), A", "INC BC", "INC B", "DEC B", "LD B, u8", "RLCA", "LD (u16), SP", "ADD HL, BC", "LD A, (BC)", "DEC BC", "INC C", "DEC C", "LD C, u8", "RRCA",
     "STOP", "LD DE, u16", "LD (DE), A", "INC DE", "INC D", "DEC D", "LD D, u8", "RLA", "JR e8", "ADD HL, DE", "LD A, (DE)", "DEC DE", "INC E", "DEC E", "LD E, u8", "RRA",

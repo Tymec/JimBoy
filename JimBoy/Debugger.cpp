@@ -277,19 +277,19 @@ void Debugger::CreateCpuWindow(unsigned cycles) {
 	ImGui::Separator();
 	ImGui::Columns(5, "interrupts_ie");
 	ImGui::Text("V-Blank:"); 
-	ImGui::Text("%d", cpu->interrupts.getIe(VBLANK));
+	ImGui::Text("%d", memoryController->interrupts.getIe(VBLANK));
 	ImGui::NextColumn();
 	ImGui::Text("LCD:");
-	ImGui::Text("%d", cpu->interrupts.getIe(LCD));
+	ImGui::Text("%d", memoryController->interrupts.getIe(LCD));
 	ImGui::NextColumn();
 	ImGui::Text("Timer:");
-	ImGui::Text("%d", cpu->interrupts.getIe(TIMER));
+	ImGui::Text("%d", memoryController->interrupts.getIe(TIMER));
 	ImGui::NextColumn();
 	ImGui::Text("Serial:");
-	ImGui::Text("%d", cpu->interrupts.getIe(SERIAL));
+	ImGui::Text("%d", memoryController->interrupts.getIe(SERIAL));
 	ImGui::NextColumn();
 	ImGui::Text("Joypad:");
-	ImGui::Text("%d", cpu->interrupts.getIe(JOYPAD));
+	ImGui::Text("%d", memoryController->interrupts.getIe(JOYPAD));
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 	ImGui::Separator();
@@ -298,19 +298,19 @@ void Debugger::CreateCpuWindow(unsigned cycles) {
 	ImGui::Separator();
 	ImGui::Columns(5, "interrupts_if");
 	ImGui::Text("V-Blank:");
-	ImGui::Text("%d", cpu->interrupts.getIf(VBLANK));
+	ImGui::Text("%d", memoryController->interrupts.getIf(VBLANK));
 	ImGui::NextColumn();
 	ImGui::Text("LCD:");
-	ImGui::Text("%d", cpu->interrupts.getIf(LCD));
+	ImGui::Text("%d", memoryController->interrupts.getIf(LCD));
 	ImGui::NextColumn();
 	ImGui::Text("Timer:");
-	ImGui::Text("%d", cpu->interrupts.getIf(TIMER));
+	ImGui::Text("%d", memoryController->interrupts.getIf(TIMER));
 	ImGui::NextColumn();
 	ImGui::Text("Serial:");
-	ImGui::Text("%d", cpu->interrupts.getIf(SERIAL));
+	ImGui::Text("%d", memoryController->interrupts.getIf(SERIAL));
 	ImGui::NextColumn();
 	ImGui::Text("Joypad:");
-	ImGui::Text("%d", cpu->interrupts.getIf(JOYPAD));
+	ImGui::Text("%d", memoryController->interrupts.getIf(JOYPAD));
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 	ImGui::Separator();
@@ -393,7 +393,7 @@ void Debugger::CreateCartridgeWindow() {
 	ImGui::Text("Version Number: %d", cartInfo->versionNumber);
 	ImGui::Text("Destination Code:");
 	ImGui::SameLine();
-	ImGui::Text(cartInfo->destinationCode == 1 ? "Non-Japanese" : "Japanese");
+	ImGui::Text(cartInfo->destinationCode == 0 ? "Non-Japanese" : "Japanese");
 	if (cartInfo->sgbFlag) {
 		ImGui::Text("Licensee Code: %s", cartridgeNewLicencee.at((int)cartInfo->newLicenseeCode).c_str());
 	} else {
